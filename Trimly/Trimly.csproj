@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.13"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.13" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Components\" />
+      <Folder Include="Core\Application\DTOs\" />
+      <Folder Include="Core\Application\Interfaces\" />
+      <Folder Include="Core\Application\Services\" />
+      <Folder Include="Core\Application\Utils\" />
+      <Folder Include="Core\Domain\" />
+      <Folder Include="Infrastructure\Api\" />
+      <Folder Include="Infrastructure\Storage\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Pages\Index.razor" />
+      <AdditionalFiles Include="Components\Shared\MainLayout.razor" />
+      <AdditionalFiles Include="Components\Shared\NavMenu.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Shared\MainLayout.razor" />
+      <_ContentIncludedByDefault Remove="Shared\NavMenu.razor" />
+      <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
+    </ItemGroup>
+
+</Project>
