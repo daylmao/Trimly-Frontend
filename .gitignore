@@ -1,0 +1,28 @@
+# Configuración de Rider
+.idea/
+*.sln.iml
+*.csproj.iml
+*.DotSettings
+*.DotSettings.user
+
+# Archivos de usuario (configuraciones personales)
+*.user
+*.userprefs
+*.suo
+
+# Carpetas de compilación y dependencias
+bin/
+obj/
+packages/
+
+# Logs y caché
+*.log
+*.cache
+*.pidb
+*.ilk
+*.pdb
+
+# .NET
+.vs/
+*.swp
+*.nupkg
