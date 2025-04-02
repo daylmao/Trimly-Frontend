@@ -1,0 +1,148 @@
+@page "/login"
+@using System.Security.Claims
+@inject IAuthService AuthService
+@inject CustomAuthStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject ILogger<Login> Logger
+
+<PageTitle>Iniciar Sesión - Trimly</PageTitle>
+
+<div class="min-h-screen bg-background text-text flex flex-col">
+    <header class="bg-surface shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0">
+                        <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            Trimly
+                        </span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/login" class="text-text px-4 py-2 rounded-md text-sm font-medium bg-gray-700 transition duration-300">
+                        Iniciar Sesión
+                    </a>
+                    <a href="/register" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition duration-300 flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i> Registrarse
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 bg-surface p-10 rounded-xl shadow-lg">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-primary mb-2">Bienvenido de nuevo</h1>
+                <p class="text-gray-400">Ingresa tus credenciales para acceder</p>
+            </div>
+
+            <EditForm Model="@request" OnValidSubmit="@HandleLogin">
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Correo electrónico</label>
+                        <InputText @bind-Value="@request.Email" 
+                                 class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary text-sm" 
+                                 placeholder="tu@email.com" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Contraseña</label>
+                        <InputText @bind-Value="@request.Password" type="password"
+                                 class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary text-sm" 
+                                 placeholder="••••••••" />
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(_errorMessage))
+                    {
+                        <div class="p-3 bg-red-900/20 border-l-4 border-red-500 text-red-300 rounded">
+                            <p>@_errorMessage</p>
+                        </div>
+                    }
+
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm">
+                            <a href="/reset-password" class="text-primary hover:underline">¿Olvidaste tu contraseña?</a>
+                        </div>
+                    </div>
+
+                    <button type="submit" disabled="@_isLoading"
+                            class="w-full bg-primary text-white py-2.5 px-4 rounded-md font-medium flex items-center justify-center gap-2">
+                        @if (_isLoading)
+                        {
+                            <span class="animate-spin">↻</span>
+                            <span>Autenticando...</span>
+                        }
+                        else
+                        {
+                            <span>Iniciar Sesión</span>
+                        }
+                    </button>
+                </div>
+            </EditForm>
+
+            <div class="text-center text-sm text-gray-400">
+                ¿No tienes una cuenta? <a href="/register" class="text-primary hover:underline">Regístrate</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-6 text-center text-sm text-gray-500">
+        <p>&copy; @DateTime.Now.Year Trimly. Todos los derechos reservados.</p>
+    </footer>
+</div>
+
+@code {
+    private AuthenticateRequestDTO request = new();
+    private string? _errorMessage;
+    private bool _isLoading;
+
+    private async Task HandleLogin()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
+        {
+            var token = await AuthService.AuthenticateAsync(request.Email, request.Password);
+            if (!string.IsNullOrEmpty(token))
+            {
+
+                var claims = CustomAuthStateProvider.ParseClaimsFromJwt(token);
+                var roles = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
+                
+
+                if (roles.Contains("Owner"))
+                {
+                    Navigation.NavigateTo("/owner-dashboard", forceLoad: true);
+                }
+                else if (roles.Contains("Barber"))
+                {
+                    Navigation.NavigateTo("/barber/home", forceLoad: true);
+                }
+                else if (roles.Contains("Client"))
+                {
+                    Navigation.NavigateTo("/user/home", forceLoad: true);
+                }
+                else
+                {
+                    _errorMessage = "Usuario sin rol asignado";
+                }
+            }
+            else
+            {
+                _errorMessage = "Credenciales inválidas";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "Error durante el login";
+            Logger.LogError(ex, "Error en HandleLogin");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

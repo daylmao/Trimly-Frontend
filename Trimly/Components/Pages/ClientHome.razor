@@ -1,0 +1,462 @@
+@page "/user/home"
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+@attribute [Authorize(Roles = nameof(Roles.Client))]
+<body class="bg-background text-text">
+<!-- Encabezado con navegación moderna -->
+<header class="bg-surface/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center py-4">
+      <div class="flex items-center">
+        <a href="/user/home" class="flex items-center">
+          <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Trimly</span>
+        </a>
+      </div>
+
+      <!-- Navegación principal - Versión escritorio -->
+      <nav class="hidden md:flex items-center space-x-1">
+        <a href="/user/home" class="px-3 py-2 rounded-md text-sm font-medium bg-primary/20 text-primary transition duration-300">
+          Inicio
+        </a>
+        <a href="explorar.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/10 transition duration-300">
+          Explorar
+        </a>
+            
+        <a href="citas.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/10 transition duration-300">
+          Mis Citas
+        </a>
+      </nav>
+
+      <!-- Búsqueda y perfil -->
+      <div class="flex items-center space-x-4">
+        <div class="relative hidden md:block">
+          <input type="text" placeholder="Buscar barberías..." class="w-40 lg:w-64 bg-gray-700/50 border border-gray-600 rounded-full py-1.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+          <button class="absolute right-0 top-0 mt-1.5 mr-3 text-gray-400">
+            <i class="fas fa-search text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Perfil de usuario -->
+        <div class="relative group">
+          <button class="flex items-center space-x-1 p-1 rounded-full hover:bg-gray-700/50 transition duration-300">
+            <img src="https://via.placeholder.com/40" alt="Perfil" class="w-8 h-8 rounded-full border border-gray-600"/>
+            <i class="fas fa-chevron-down text-xs hidden md:block"></i>
+          </button>
+
+          <!-- Menú desplegable -->
+          <div
+            class="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg py-1 hidden group-hover:block" >
+            <NavLink href="perfil-usuario.html" class="block px-4 py-2 text-sm hover:bg-gray-700">Mi Perfil</NavLink>
+            <NavLink href="configuracion.html" class="block px-4 py-2 text-sm hover:bg-gray-700">Configuración</NavLink>
+            <NavLink href="ayuda.html" class="block px-4 py-2 text-sm hover:bg-gray-700">Ayuda</NavLink>
+            <div class="border-t border-gray-700 my-1"></div>
+            <NavLink href="/login" class="block px-4 py-2 text-sm hover:bg-gray-700" @onclick="Logout">Cerrar Sesión</NavLink>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section
+  class="relative bg-gradient-to-br from-primary/20 to-background py-12">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex flex-col md:flex-row items-center justify-between">
+        <div class="mb-8 md:mb-0 md:mr-8">
+          <h1 class="text-4xl font-bold mb-4">Bienvenido, Guirmer</h1>
+          <p class="text-xl text-gray-300 mb-6">
+            ¿Listo para lucir tu mejor estilo?
+          </p>
+          <div class="flex space-x-4">
+            <a
+              href="citas.html"
+              class="bg-primary hover:bg-purple-700 text-white px-6 py-3 rounded-md transition duration-300 flex items-center">
+              <i class="fas fa-calendar-alt mr-2"></i>
+              Mis Citas
+            </a>
+            <a
+              href="explorar.html"
+              class="bg-surface hover:bg-gray-700 text-white px-6 py-3 rounded-md transition duration-300 flex items-center">
+              <i class="fas fa-search mr-2"></i>
+              Explorar
+            </a>
+          </div>
+        </div>
+        <div class="relative">
+          <div
+            class="absolute -top-4 -left-4 w-24 h-24 bg-primary/20 rounded-full"></div>
+          <div
+            class="absolute -bottom-4 -right-4 w-32 h-32 bg-secondary/20 rounded-full"></div>
+          <img
+            src="https://via.placeholder.com/400x300"
+            alt="Barbería"
+            class="relative z-10 rounded-lg shadow-xl w-full max-w-md"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contenido principal -->
+<main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="max-w-5xl mx-auto">
+    <!-- Próximas citas -->
+    <div class="bg-surface rounded-lg shadow-md overflow-hidden mb-12">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Próximas Citas</h2>
+          <a
+            href="citas.html"
+            class="text-primary hover:text-purple-400 transition duration-300 flex items-center">
+            Ver todas
+            <i class="fas fa-chevron-right ml-2 text-sm"></i>
+          </a>
+        </div>
+
+        <!-- Lista de citas -->
+        <div class="space-y-6">
+          <!-- Cita 1 -->
+          <div class="bg-gray-800/50 rounded-lg overflow-hidden">
+            <div class="p-6">
+              <div
+                class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="flex items-start space-x-4">
+                  <div
+                    class="bg-primary/20 text-primary rounded-lg p-3 flex flex-col items-center justify-center min-w-[60px]">
+                    <span class="text-lg font-bold">9</span>
+                    <span class="text-xs">JUN</span>
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold">Corte de Cabello</h3>
+                    <div class="flex items-center mt-1">
+                      <i class="far fa-clock text-gray-400 mr-1"></i>
+                      <span class="text-gray-400">11:00 AM - 11:30 AM</span>
+                    </div>
+                    <div class="flex items-center mt-2">
+                      <img
+                        src="https://via.placeholder.com/150"
+                        alt="Barbería"
+                        class="w-8 h-8 rounded-full mr-2"/>
+                      <span>El Corte Perfecto</span>
+                    </div>
+                    <div class="flex items-center mt-1">
+                      <i
+                        class="fas fa-map-marker-alt text-gray-400 mr-1"></i>
+                      <span class="text-gray-400">Calle Principal 123, Ciudad</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col space-y-2 mt-4 md:mt-0">
+                  <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
+                    <span
+                      class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                    Confirmada
+                  </span>
+                  <div class="flex space-x-2 mt-2">
+                    <button
+                      class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition duration-300">
+                      <i class="fas fa-calendar-alt mr-1"></i> Reprogramar
+                    </button>
+                    <button
+                      class="px-3 py-1 bg-red-900/30 hover:bg-red-900/50 text-red-400 rounded text-sm transition duration-300">
+                      <i class="fas fa-times mr-1"></i> Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cita 2 -->
+          <div class="bg-gray-800/50 rounded-lg overflow-hidden">
+            <div class="p-6">
+              <div
+                class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="flex items-start space-x-4">
+                  <div
+                    class="bg-primary/20 text-primary rounded-lg p-3 flex flex-col items-center justify-center min-w-[60px]">
+                    <span class="text-lg font-bold">15</span>
+                    <span class="text-xs">JUN</span>
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold">Afeitado Clásico</h3>
+                    <div class="flex items-center mt-1">
+                      <i class="far fa-clock text-gray-400 mr-1"></i>
+                      <span class="text-gray-400">2:00 PM - 2:20 PM</span>
+                    </div>
+                    <div class="flex items-center mt-2">
+                      <img
+                        src="https://via.placeholder.com/150"
+                        alt="Barbería"
+                        class="w-8 h-8 rounded-full mr-2"
+                      />
+                      <span>Barber Shop Premium</span>
+                    </div>
+                    <div class="flex items-center mt-1">
+                      <i
+                        class="fas fa-map-marker-alt text-gray-400 mr-1"></i>
+                      <span class="text-gray-400">Av. Central 456, Ciudad</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col space-y-2 mt-4 md:mt-0">
+                  <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-400">
+                    <span
+                      class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+                    Pendiente
+                  </span>
+                  <div class="flex space-x-2 mt-2">
+                    <button
+                      class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition duration-300">
+                      <i class="fas fa-calendar-alt mr-1"></i> Reprogramar
+                    </button>
+                    <button
+                      class="px-3 py-1 bg-red-900/30 hover:bg-red-900/50 text-red-400 rounded text-sm transition duration-300">
+                      <i class="fas fa-times mr-1"></i> Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barberías recomendadas -->
+    <div class="mb-12">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Barberías Recomendadas</h2>
+        <a
+          href="explorar.html"
+          class="text-primary hover:text-purple-400 transition duration-300 flex items-center">
+          Ver más
+          <i class="fas fa-chevron-right ml-2 text-sm"></i>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Barbería 1 -->
+        <div
+          class="bg-surface rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1">
+          <img
+            src="https://via.placeholder.com/400x200"
+            alt="El Corte Perfecto"
+            class="w-full h-48 object-cover"/>
+          <div class="p-5">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold text-lg">El Corte Perfecto</h3>
+                <div class="flex items-center mt-1">
+                  <div class="flex text-yellow-400">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                  </div>
+                  <span class="text-gray-400 text-sm ml-2">(120)</span>
+                </div>
+              </div>
+              <span
+                class="bg-green-900/30 text-green-400 text-xs px-2 py-1 rounded-full">Abierto</span>
+            </div>
+            <p class="text-gray-400 text-sm mt-2 mb-4">
+              Especialistas en cortes modernos y clásicos
+            </p>
+            <div class="flex items-center text-gray-400 text-sm mb-4">
+              <i class="fas fa-map-marker-alt mr-1"></i>
+              <span>Calle Principal 123, Ciudad</span>
+            </div>
+            <a
+              href="perfil-barberia.html"
+              class="block text-center bg-primary text-white py-2 rounded-md hover:bg-purple-700 transition duration-300">
+              Ver perfil
+            </a>
+          </div>
+        </div>
+
+        <!-- Barbería 2 -->
+        <div
+          class="bg-surface rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1">
+          <img
+            src="https://via.placeholder.com/400x200"
+            alt="Estilo Urbano"
+            class="w-full h-48 object-cover"/>
+          <div class="p-5">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold text-lg">Estilo Urbano</h3>
+                <div class="flex items-center mt-1">
+                  <div class="flex text-yellow-400">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <span class="text-gray-400 text-sm ml-2">(95)</span>
+                </div>
+              </div>
+              <span
+                class="bg-green-900/30 text-green-400 text-xs px-2 py-1 rounded-full">Abierto</span>
+            </div>
+            <p class="text-gray-400 text-sm mt-2 mb-4">
+              Lo último en tendencias urbanas
+            </p>
+            <div class="flex items-center text-gray-400 text-sm mb-4">
+              <i class="fas fa-map-marker-alt mr-1"></i>
+              <span>Av. Moderna 789, Ciudad</span>
+            </div>
+            <a
+              href="perfil-barberia.html"
+              class="block text-center bg-primary text-white py-2 rounded-md hover:bg-purple-700 transition duration-300">
+              Ver perfil
+            </a>
+          </div>
+        </div>
+
+        <!-- Barbería 3 -->
+        <div
+          class="bg-surface rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1">
+          <img
+            src="https://via.placeholder.com/400x200"
+            alt="Barba & Co."
+            class="w-full h-48 object-cover"/>
+          <div class="p-5">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold text-lg">Barba & Co.</h3>
+                <div class="flex items-center mt-1">
+                  <div class="flex text-yellow-400">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                  </div>
+                  <span class="text-gray-400 text-sm ml-2">(78)</span>
+                </div>
+              </div>
+              <span class="bg-red-900/30 text-red-400 text-xs px-2 py-1 rounded-full">Cerrado</span>
+            </div>
+            <p class="text-gray-400 text-sm mt-2 mb-4">
+              Especialistas en barbas y tratamientos
+            </p>
+            <div class="flex items-center text-gray-400 text-sm mb-4">
+              <i class="fas fa-map-marker-alt mr-1"></i>
+              <span>Plaza Central 45, Ciudad</span>
+            </div>
+            <a
+              href="perfil-barberia.html"
+              class="block text-center bg-primary text-white py-2 rounded-md hover:bg-purple-700 transition duration-300">
+              Ver perfil
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+        
+  </div>
+</main>
+
+<!-- Pie de página -->
+<footer class="bg-surface mt-12 py-8">
+  <div class="container mx-auto px-6">
+    <div class="flex flex-col md:flex-row justify-between items-center">
+      <div class="mb-6 md:mb-0">
+        <span
+          class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+        >Trimly</span
+        >
+        <p class="text-gray-400 mt-2">
+          La mejor forma de reservar tu barbero.
+        </p>
+      </div>
+      <div class="flex space-x-8">
+        <div>
+          <h3 class="font-semibold mb-2">Empresa</h3>
+          <ul class="space-y-1">
+            <li>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition duration-300"
+              >Sobre nosotros</a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition duration-300"
+              >Contacto</a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition duration-300">Blog</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">Legal</h3>
+          <ul class="space-y-1">
+            <li>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition duration-300"
+              >Privacidad</a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition duration-300">Términos</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div
+      class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-gray-400">
+        &copy; 2025 Trimly. Todos los derechos reservados.
+      </p>
+      <div class="flex space-x-4 mt-4 md:mt-0">
+        <a
+          href="#"
+          class="text-gray-400 hover:text-primary transition duration-300">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a
+          href="#"
+          class="text-gray-400 hover:text-primary transition duration-300">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a
+          href="#"
+          class="text-gray-400 hover:text-primary transition duration-300">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+    
+</body>
+
+@code
+{
+  private async Task Logout()
+  {
+    await AuthService.LogoutAsync();
+    
+    Navigation.NavigateTo("/login");
+  }
+  
+}

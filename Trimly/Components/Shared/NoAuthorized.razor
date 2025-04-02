@@ -1,0 +1,73 @@
+<body class="min-h-screen bg-background text-text flex flex-col">
+<!-- Header -->
+<header class="bg-surface shadow-md">
+  <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <a href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Trimly</a>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="flex-1 container mx-auto px-4 py-12 flex items-center justify-center">
+  <div class="text-center">
+    <div class="inline-block p-4 bg-red-900/20 rounded-full mb-6">
+      <i class="fas fa-lock text-4xl text-secondary"></i>
+    </div>
+    <h1 class="text-3xl font-bold mb-4">Acceso Denegado</h1>
+    <p class="text-text opacity-70 mb-8 max-w-md mx-auto">
+      No tienes permisos para acceder a esta página. Si crees que esto es un error, por favor contacta con soporte.
+    </p>
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <a href="/login" class="inline-flex items-center px-6 py-3 bg-surface border border-gray-700 text-text font-semibold rounded-md hover:bg-surface/80 transition duration-300">
+        <i class="fas fa-sign-in-alt mr-2"></i>
+        Iniciar sesión
+      </a>
+      <a href="/" class="inline-flex items-center px-6 py-3 bg-primary text-text font-semibold rounded-md hover:bg-primary/80 transition duration-300">
+        Volver a la página principal
+        <i class="fas fa-chevron-right ml-2"></i>
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-surface py-8 border-t border-gray-700">
+  <div class="container mx-auto px-4">
+    <div class="flex flex-col md:flex-row justify-between items-center">
+      <div class="mb-6 md:mb-0">
+        <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Trimly</span>
+        <p class="text-text opacity-70 mt-2">La mejor forma de reservar tu barbero.</p>
+      </div>
+      <div class="flex space-x-8">
+        <div>
+          <h3 class="font-semibold mb-2">Empresa</h3>
+          <ul class="space-y-1">
+            <li>
+              <a href="#" class="text-text opacity-70 hover:text-accent transition duration-300">Sobre nosotros</a>
+            </li>
+            <li>
+              <a href="#" class="text-text opacity-70 hover:text-accent transition duration-300">Contacto</a>
+            </li>
+            <li>
+              <a href="#" class="text-text opacity-70 hover:text-accent transition duration-300">Blog</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">Legal</h3>
+          <ul class="space-y-1">
+            <li>
+              <a href="#" class="text-text opacity-70 hover:text-accent transition duration-300">Privacidad</a>
+            </li>
+            <li>
+              <a href="#" class="text-text opacity-70 hover:text-accent transition duration-300">Términos</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-text opacity-70">&copy; 2025 Trimly. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>
+</body>

@@ -1,0 +1,121 @@
+@page "/confirm-account"
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Confirmar Cuenta - Trimly</PageTitle>
+
+<div class="bg-background text-text flex flex-col min-h-screen">
+  <header class="bg-surface shadow-md">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-center h-16">
+        <a href="/" class="flex items-center">
+          <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Trimly
+          </span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="bg-surface p-8 rounded-lg shadow-lg max-w-md w-full">
+      <div class="text-center mb-8">
+        <div class="flex justify-center mb-6">
+          <div class="bg-primary/20 rounded-full p-4">
+            <i class="fas fa-envelope-open-text text-4xl text-primary"></i>
+          </div>
+        </div>
+        <h1 class="text-3xl font-bold text-primary mb-2">Confirmar tu cuenta</h1>
+        <p class="text-gray-400">Ingresa el token de confirmación que enviamos a tu correo electrónico</p>
+      </div>
+
+      <EditForm Model="@_confirmAccountRequestDto" OnValidSubmit="HandleSubmit">
+        <div class="mb-6">
+          <label for="confirmation-token" class="block text-sm font-medium mb-2">Token de confirmación</label>
+          <InputText
+            id="confirmation-token"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-lg"
+            @bind-Value="_confirmAccountRequestDto.Token"
+            placeholder="Ingresa tu token aquí"
+            required />
+        </div>
+
+        @if (isLoading)
+        {
+          <div class="flex justify-center my-4">
+            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        }
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+          <div class="mb-4 p-3 bg-red-900/20 border-l-4 border-red-500 text-red-300 rounded">
+            <p>@errorMessage</p>
+          </div>
+        }
+
+        <button type="submit" 
+                class="w-full bg-primary text-white py-3 rounded-md hover:bg-purple-700 transition-colors duration-200 font-medium flex items-center justify-center"
+                disabled="@isLoading">
+          <i class="fas fa-check-circle mr-2"></i>
+          Confirmar cuenta
+        </button>
+      </EditForm>
+
+      <div class="mt-8 border-t border-gray-700 pt-6">
+        <p class="text-sm text-gray-400 text-center">
+          Si tienes problemas para confirmar tu cuenta, por favor
+          <a href="/contact" class="text-accent hover:underline">contáctanos</a>.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-surface py-8">
+    <div class="container mx-auto px-6 text-center">
+      <p class="text-gray-400">&copy; 2025 Trimly. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>
+
+@code {
+  private readonly ConfirmAccountRequestDTO _confirmAccountRequestDto = new();
+  private string? errorMessage;
+  private bool isLoading;
+  private string? userId;
+
+  protected override async Task OnInitializedAsync() 
+  {
+    userId = await LocalStorage.GetItemAsync<string>("userId");
+    if (string.IsNullOrEmpty(userId))
+      errorMessage = "Sesión inválida. Por favor, regístrese nuevamente.";
+  }
+
+  private async Task HandleSubmit()
+  {
+    if (string.IsNullOrWhiteSpace(_confirmAccountRequestDto.Token))
+    {
+      errorMessage = "Por favor ingresa el token de confirmación";
+      return;
+    }
+
+    isLoading = true;
+    errorMessage = null;
+
+    var response = await AuthService.ConfirmAccountAsync(userId!, _confirmAccountRequestDto.Token);
+
+    if (response.Success)
+    {
+      await LocalStorage.RemoveItemAsync("userId");
+      await Task.Delay(2500);
+      NavigationManager.NavigateTo("/login");
+    }
+    else
+    {
+      errorMessage = response.Error ?? "Error al confirmar la cuenta";
+    }
+
+    isLoading = false;
+  }
+}
