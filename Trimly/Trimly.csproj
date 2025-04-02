@@ -7,16 +7,18 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.13"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.13" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.14" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.0" />
+        <PackageReference Include="System.Net.Http.Json" Version="8.0.1" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Components\" />
-      <Folder Include="Core\Application\DTOs\" />
-      <Folder Include="Core\Application\Interfaces\" />
-      <Folder Include="Core\Application\Services\" />
-      <Folder Include="Core\Application\Utils\" />
       <Folder Include="Core\Domain\" />
       <Folder Include="Infrastructure\Api\" />
       <Folder Include="Infrastructure\Storage\" />
@@ -25,7 +27,6 @@
     <ItemGroup>
       <AdditionalFiles Include="Components\Pages\Index.razor" />
       <AdditionalFiles Include="Components\Shared\MainLayout.razor" />
-      <AdditionalFiles Include="Components\Shared\NavMenu.razor" />
     </ItemGroup>
 
     <ItemGroup>
