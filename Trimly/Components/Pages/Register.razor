@@ -1,0 +1,178 @@
+@page "/Register"
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Registrarse - Trimly</PageTitle>
+
+<div class="min-h-screen bg-background text-text">
+    <header class="bg-surface shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0">
+                        <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            Trimly
+                        </span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/login" class="text-text px-4 py-2 rounded-md text-sm font-medium bg-gray-700 transition duration-300">
+                        Iniciar Sesión
+                    </a>
+                    <a href="/register" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition duration-300 flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i> Registrarse
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-md">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold">Crear cuenta</h1>
+        </div>
+
+        <div class="bg-surface rounded-lg shadow-md overflow-hidden">
+            <div class="p-5">
+                <EditForm Model="@_request" OnValidSubmit="HandleRegister">
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium mb-1">Tipo de cuenta</label>
+                        <select @bind="_selectedRole" class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary" required>
+                            @foreach (Roles role in Enum.GetValues(typeof(Roles)))
+                            {
+                                <option value="@role">@role</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="space-y-4 mb-5">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Nombre</label>
+                                <InputText type="text" @bind-Value="_request.FirstName" 
+                                         class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary text-sm" 
+                                         required />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Apellido</label>
+                                <InputText type="text" @bind-Value="_request.LastName" 
+                                         class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary text-sm" 
+                                         required />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Email</label>
+                            <InputText type="email" @bind-Value="_request.Email" 
+                                     class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary text-sm" 
+                                     required />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Nombre de usuario</label>
+                            <InputText type="text" @bind-Value="_request.UserName" 
+                                     class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary text-sm" 
+                                     required />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Teléfono</label>
+                            <InputText type="tel" @bind-Value="_request.PhoneNumber" 
+                                     class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary text-sm" 
+                                     required />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Contraseña</label>
+                            <InputText type="password" @bind-Value="_request.Password" 
+                                     class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary text-sm" 
+                                     required />
+                        </div>
+                    </div>
+
+                    @if (isLoading)
+                    {
+                        <div class="flex justify-center my-4">
+                            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="mb-4 p-3 bg-red-900/20 border-l-4 border-red-500 text-red-300 rounded">
+                            <p>@errorMessage</p>
+                        </div>
+                    }
+
+                    <button type="submit"
+                            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-4 rounded-md transition duration-300 flex items-center justify-center gap-2"
+                            disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Procesando...</span>
+                        }
+                        else
+                        {
+                            <span>Crear cuenta</span>
+                        }
+                    </button>
+                </EditForm>
+
+                <div class="text-center mt-4 text-sm">
+                    <p class="text-gray-400">
+                        ¿Ya tienes una cuenta? <a href="/login" class="text-primary hover:underline">Iniciar sesión</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-6 text-center text-sm text-gray-500">
+        <p>&copy; 2025 Trimly. Todos los derechos reservados.</p>
+    </footer>
+</div>
+
+
+@code {
+    private RegisterRequestDTO _request = new();
+    private Roles _selectedRole = Roles.Client;
+    private bool isLoading = false;
+    private string? errorMessage;
+
+    private static readonly Dictionary<Roles, string> RoleEndpoints = new()
+    {
+        [Roles.Owner] = "owners",
+        [Roles.Client] = "clients"
+    };
+
+    private async Task HandleRegister()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var response = await AuthService.RegisterAsync(RoleEndpoints[_selectedRole], _request);
+            if (!string.IsNullOrEmpty(response.UserId))
+            {
+                await LocalStorage.SetItemAsync("userId", response.UserId);
+                NavigationManager.NavigateTo("/confirm-account", forceLoad: true);
+            }
+            else
+            {
+                errorMessage = response.Error ?? "Error en el registro";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error inesperado. Intente nuevamente más tarde.";
+            Console.Error.WriteLine($"Error en registro: {ex}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged(); 
+        }
+    }
+}
