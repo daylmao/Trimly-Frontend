@@ -1,0 +1,247 @@
+@page "/account-edit"
+
+<body class="min-h-screen bg-background text-text">
+<!-- Header -->
+<header class="bg-surface/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <NavLink href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Trimly
+        </NavLink>
+        <nav class="hidden md:flex items-center space-x-6">
+            <NavLink href="/explorer" class="text-sm font-medium hover:text-primary transition-colors">
+                Explorar
+            </NavLink>
+            <NavLink href="/appointments" class="text-sm font-medium hover:text-primary transition-colors">
+                Mis Citas
+            </NavLink>
+        </nav>
+        <div class="flex items-center space-x-4">
+            <div class="relative group">
+                <button class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-700/50 transition duration-300">
+                    <img
+                        src="https://via.placeholder.com/40"
+                        alt="Perfil"
+                        class="w-8 h-8 rounded-full border border-gray-600"
+                    />
+                    <span class="hidden md:inline-block text-sm font-medium">Juan Pérez</span>
+                    <i class="fas fa-chevron-down h-4 w-4 hidden md:block"></i>
+                </button>
+
+                <!-- Dropdown menu -->
+                <div class="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg py-1 hidden group-hover:block">
+                    <NavLink href="/account/details" class="block px-4 py-2 text-sm hover:bg-gray-700">Mi Perfil</NavLink>
+                    <a href="/configuracion" class="block px-4 py-2 text-sm hover:bg-gray-700">Configuración</a>
+                    <div class="border-t border-gray-700 my-1"></div>
+                    <button id="logout-button" class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <div class="flex items-center mb-2">
+                <NavLink href="/account/details" class="text-gray-400 hover:text-white mr-2">
+                    <i class="fas fa-arrow-left"></i>
+                </NavLink>
+                <h1 class="text-3xl font-bold">Editar Perfil</h1>
+            </div>
+            <p class="text-gray-400">Actualiza tu información personal</p>
+        </div>
+
+        <!-- Loading State (hidden by default) -->
+        <div id="loading-state" class="bg-surface rounded-lg shadow-md p-8 text-center hidden">
+            <div class="inline-flex items-center justify-center">
+                <svg class="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+            <p class="mt-4 text-gray-400">Procesando tu solicitud...</p>
+        </div>
+
+        <!-- Error State (hidden by default) -->
+        <div id="error-state" class="bg-surface rounded-lg shadow-md p-8 text-center hidden">
+            <div class="inline-block p-4 bg-red-900/20 rounded-full mb-4">
+                <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+            </div>
+            <h2 class="text-xl font-semibold mb-2">Error al actualizar los datos</h2>
+            <p id="error-message" class="text-gray-400 mb-6">No se pudieron guardar los cambios.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button id="retry-button" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-md">
+                    Intentar nuevamente
+                </button>
+                <NavLink href="/account/details" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-center">
+                    Volver a mi perfil
+                </NavLink>
+            </div>
+        </div>
+
+        <!-- Success State (hidden by default) -->
+        <div id="success-state" class="bg-surface rounded-lg shadow-md p-8 text-center hidden">
+            <div class="inline-block p-4 bg-green-900/20 rounded-full mb-4">
+                <i class="fas fa-check text-4xl text-green-500"></i>
+            </div>
+            <h2 class="text-xl font-semibold mb-2">¡Cambios guardados!</h2>
+            <p class="text-gray-400 mb-6">Tu información ha sido actualizada correctamente.</p>
+            <NavLink href="/account/details" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-md inline-block">
+                Volver a mi perfil
+            </NavLink>
+        </div>
+
+        <!-- Edit Form -->
+        <form id="edit-form" class="bg-surface rounded-lg shadow-md">
+            <div class="p-6 border-b border-gray-700">
+                <h2 class="text-xl font-semibold">Información Personal</h2>
+            </div>
+            <div class="p-6">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start mb-6">
+                    <div class="relative mb-4 sm:mb-0 sm:mr-6">
+                        <img src="https://via.placeholder.com/100" alt="Foto de perfil" class="w-24 h-24 rounded-full object-cover border-2 border-primary">
+                        <button type="button" class="absolute bottom-0 right-0 bg-primary text-white p-1.5 rounded-full shadow-md">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="w-full">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="firstName" class="block text-sm font-medium mb-1">Nombre</label>
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    name="firstName"
+                                    class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+                                    value="Juan"
+                                >
+                            </div>
+                            <div>
+                                <label for="lastName" class="block text-sm font-medium mb-1">Apellidos</label>
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    name="lastName"
+                                    class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+                                    value="Pérez"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium mb-1">Correo electrónico</label>
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-gray-500 mr-2"></i>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+                                value="juan.perez@ejemplo.com"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-medium mb-1">Teléfono</label>
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-gray-500 mr-2"></i>
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+                                value="+34 612 345 678"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="location" class="block text-sm font-medium mb-1">Ciudad</label>
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt text-gray-500 mr-2"></i>
+                            <input
+                                type="text"
+                                id="location"
+                                name="location"
+                                class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+                                value="Madrid"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="birthdate" class="block text-sm font-medium mb-1">Fecha de nacimiento</label>
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar text-gray-500 mr-2"></i>
+                            <input
+                                type="date"
+                                id="birthdate"
+                                name="birthdate"
+                                class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+                                value="1990-05-15"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="hairType" class="block text-sm font-medium mb-1">Tipo de cabello</label>
+                            <select
+                                id="hairType"
+                                name="hairType"
+                                class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+                            >
+                                <option value="">Seleccionar</option>
+                                <option value="liso" selected>Liso</option>
+                                <option value="ondulado">Ondulado</option>
+                                <option value="rizado">Rizado</option>
+                                <option value="afro">Afro</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="preferredStyle" class="block text-sm font-medium mb-1">Estilo preferido</label>
+                            <select
+                                id="preferredStyle"
+                                name="preferredStyle"
+                                class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-primary"
+                            >
+                                <option value="">Seleccionar</option>
+                                <option value="clasico">Clásico</option>
+                                <option value="moderno">Moderno</option>
+                                <option value="fade" selected>Fade</option>
+                                <option value="undercut">Undercut</option>
+                                <option value="pompadour">Pompadour</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-700 flex justify-end">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <NavLink href="/account/details" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-center">
+                        Cancelar
+                    </NavLink>
+                    <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-md">
+                        Guardar cambios
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
+</body>
+<!-- Footer -->
+
+
+
+
+@code {
+    
+}
