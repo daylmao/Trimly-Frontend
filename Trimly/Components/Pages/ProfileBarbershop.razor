@@ -1,0 +1,398 @@
+@page "/barbershop/profile"
+
+<body class="bg-background text-text">
+<!-- Encabezado con navegación moderna -->
+<header class="bg-surface/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+            <div class="flex items-center">
+                <NavLink href="/" class="flex items-center">
+                    <span
+                        class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        Trimly
+                    </span>
+                </NavLink>
+            </div>
+
+            <!-- Navegación principal - Versión escritorio -->
+            <nav class="hidden md:flex items-center space-x-1">
+                <NavLink
+                    href="/"
+                    class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/10 transition duration-300"
+                >
+                    Inicio
+                </NavLink>
+                <NavLink
+                    href="/explorer"
+                    class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/10 transition duration-300"
+                >
+                    Explorar
+                </NavLink>
+                <NavLink
+                    href="/appointments"
+                    class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/10 transition duration-300"
+                >
+                    Mis Citas
+                </NavLink>
+
+
+                <!-- Búsqueda y perfil -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative hidden md:block">
+                        <input
+                            type="text"
+                            placeholder="Buscar..."
+                            class="w-40 lg:w-64 bg-gray-700/50 border border-gray-600 rounded-full py-1.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        />
+                        <button class="absolute right-0 top-0 mt-1.5 mr-3 text-gray-400">
+                            <i class="fas fa-search text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Perfil de usuario -->
+                    <div class="relative group">
+                        <button
+                            class="flex items-center space-x-1 p-1 rounded-full hover:bg-gray-700/50 transition duration-300"
+                        >
+                            <img
+                                src="https://via.placeholder.com/40"
+                                alt="Perfil"
+                                class="w-8 h-8 rounded-full border border-gray-600"
+                            />
+                            <i class="fas fa-chevron-down text-xs hidden md:block"></i>
+                        </button>
+
+                        <!-- Menú desplegable -->
+                        <div
+                            class="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg py-1 hidden group-hover:block"
+                        >
+                            <NavLink
+                                href="perfil-usuario.html"
+                                class="block px-4 py-2 text-sm hover:bg-gray-700">
+                                Mi Perfil
+                            </NavLink>
+                            <NavLink
+                                href="configuracion.html"
+                                class="block px-4 py-2 text-sm hover:bg-gray-700">
+                                Configuración
+                            </NavLink>
+
+                            <div class="border-t border-gray-700 my-1"></div>
+                            <NavLink
+                                href="/login"
+                                class="block px-4 py-2 text-sm hover:bg-gray-700">
+                                Cerrar Sesión
+                            </NavLink>
+                        </div>
+                    </div>
+
+                    <!-- Menú móvil -->
+                    <button
+                        class="md:hidden p-2 rounded-md hover:bg-gray-700/50 transition duration-300"
+                        id="mobile-menu-button"
+                    >
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Menú móvil desplegable -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <NavLink
+                    href="/"
+                    class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">
+                    Inicio
+                </NavLink>
+                <NavLink
+                    href="/explorer"
+                    class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">
+                    Explorar
+                </NavLink>
+                <NavLink
+                    href="/appointments"
+                    class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700">
+                    Mis Citas
+                </NavLink>
+
+                <div class="relative mt-3">
+                    <input
+                        type="text"
+                        placeholder="Buscar..."
+                        class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-4 text-sm"
+                    />
+                    <button class="absolute right-0 top-0 mt-2 mr-3 text-gray-400">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Portada de la barbería -->
+<div class="relative">
+    <img
+        src="https://via.placeholder.com/1200x400"
+        alt="El Corte Perfecto"
+        class="w-full h-64 object-cover"
+    />
+    <div
+        class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent h-32"
+    ></div>
+</div>
+
+<!-- Información de la barbería -->
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between">
+        <div class="flex items-center mb-4 md:mb-0">
+            <img
+                src="https://via.placeholder.com/150"
+                alt="Logo de El Corte Perfecto"
+                class="w-24 h-24 rounded-full border-4 border-primary shadow-lg"
+            />
+            <div class="ml-4">
+                <h1 class="text-3xl font-bold">El Corte Perfecto</h1>
+                <div class="flex items-center mt-1">
+                    <p class="text-gray-400">Barbería y Peluquería</p>
+                    <span class="mx-2 text-gray-600">•</span>
+                    <div class="flex items-center">
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <span>4.9</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex space-x-4">
+            <NavLink href="/appointments"
+               class="bg-primary text-white px-6 py-2 rounded-md hover:bg-purple-700 transition duration-300 flex items-center">
+                <i class="fas fa-calendar-plus mr-2"></i>Reservar Cita
+            </NavLink>
+
+            <button
+                class="bg-surface text-text px-6 py-2 rounded-md hover:bg-gray-700 transition duration-300 flex items-center">
+                <i class="fas fa-share-alt mr-2"></i>Compartir
+            </button>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="flex justify-center space-x-8 mt-8">
+        <div class="text-center">
+            <p class="text-2xl font-bold">4.9</p>
+            <p class="text-gray-400">Calificación</p>
+        </div>
+        <div class="text-center">
+            <p class="text-2xl font-bold">1.2k</p>
+            <p class="text-gray-400">Reseñas</p>
+        </div>
+    </div>
+
+    <!-- Pestañas de navegación -->
+    <div class="mt-8 border-b border-gray-700">
+        <nav class="flex space-x-8 overflow-x-auto pb-1">
+            <NavLink
+                href="#"
+                class="text-primary border-b-2 border-primary px-4 py-2 whitespace-nowrap">
+                Inicio
+            </NavLink>
+            <NavLink
+                href="#"
+                class="text-text hover:text-primary px-4 py-2 whitespace-nowrap">
+                Servicios
+            </NavLink>
+            <NavLink
+                href="#"
+                class="text-text hover:text-primary px-4 py-2 whitespace-nowrap">
+                Galería
+            </NavLink>
+            <NavLink
+                href="#"
+                class="text-text hover:text-primary px-4 py-2 whitespace-nowrap">
+                Reseñas
+            </NavLink>
+            <NavLink
+                href="#"
+                class="text-text hover:text-primary px-4 py-2 whitespace-nowrap">
+                Contacto
+            </NavLink>
+        </nav>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Columna izquierda -->
+        <div class="md:col-span-2 space-y-8">
+            <!-- Sobre nosotros -->
+            <section class="bg-surface rounded-lg p-6 shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Sobre Nosotros</h2>
+                <p class="text-gray-400">
+                    En El Corte Perfecto, nos dedicamos a ofrecer los mejores
+                    servicios de barbería y peluquería. Con más de 10 años de
+                    experiencia, nuestro equipo de profesionales está comprometido con
+                    la excelencia y la satisfacción del cliente. Utilizamos técnicas
+                    modernas y productos de alta calidad para garantizar que cada
+                    cliente salga sintiéndose renovado y con confianza.
+                </p>
+            </section>
+
+            <!-- Servicios destacados -->
+            <section class="bg-surface rounded-lg p-6 shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Servicios Destacados</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-cut text-2xl text-primary"></i>
+                        <div>
+                            <p class="font-semibold">Corte de Cabello</p>
+                            <p class="text-gray-400">Desde $20</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-razor text-2xl text-primary"></i>
+                        <div>
+                            <p class="font-semibold">Afeitado Clásico</p>
+                            <p class="text-gray-400">Desde $15</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-palette text-2xl text-primary"></i>
+                        <div>
+                            <p class="font-semibold">Coloración</p>
+                            <p class="text-gray-400">Desde $40</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-spa text-2xl text-primary"></i>
+                        <div>
+                            <p class="font-semibold">Tratamiento Capilar</p>
+                            <p class="text-gray-400">Desde $30</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Galería de fotos -->
+            <section class="bg-surface rounded-lg p-6 shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Galería</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <img
+                        src="https://via.placeholder.com/300x300"
+                        alt="Corte de cabello"
+                        class="w-full h-40 object-cover rounded-lg hover:opacity-80 transition duration-300"
+                    />
+                    <img
+                        src="https://via.placeholder.com/300x300"
+                        alt="Afeitado"
+                        class="w-full h-40 object-cover rounded-lg hover:opacity-80 transition duration-300"
+                    />
+                    <img
+                        src="https://via.placeholder.com/300x300"
+                        alt="Peinado"
+                        class="w-full h-40 object-cover rounded-lg hover:opacity-80 transition duration-300"
+                    />
+                    <img
+                        src="https://via.placeholder.com/300x300"
+                        alt="Coloración"
+                        class="w-full h-40 object-cover rounded-lg hover:opacity-80 transition duration-300"
+                    />
+                    <img
+                        src="https://via.placeholder.com/300x300"
+                        alt="Tratamiento"
+                        class="w-full h-40 object-cover rounded-lg hover:opacity-80 transition duration-300"
+                    />
+                    <img
+                        src="https://via.placeholder.com/300x300"
+                        alt="Estilizado"
+                        class="w-full h-40 object-cover rounded-lg hover:opacity-80 transition duration-300"
+                    />
+                </div>
+            </section>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="space-y-8">
+            <!-- Información de contacto -->
+            <section class="bg-surface rounded-lg p-6 shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Contacto</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-map-marker-alt text-primary"></i>
+                        <p>Calle Principal 123, Ciudad</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-phone text-primary"></i>
+                        <p>+1 234 567 890</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-envelope text-primary"></i>
+                        <p>info@elcorteperfecto.com</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-clock text-primary"></i>
+                        <p>Lun - Sáb: 9:00 AM - 8:00 PM</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reseñas destacadas -->
+            <section class="bg-surface rounded-lg p-6 shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Reseñas Destacadas</h2>
+                <div class="space-y-4">
+                    <div class="border-b border-gray-700 pb-4">
+                        <div class="flex items-center mb-2">
+                            <img
+                                src="https://via.placeholder.com/40"
+                                alt="Usuario"
+                                class="w-10 h-10 rounded-full mr-3"
+                            />
+                            <div>
+                                <p class="font-semibold">Juan Pérez</p>
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-400">
+                            Excelente servicio, siempre salgo satisfecho con mi corte.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="flex items-center mb-2">
+                            <img
+                                src="https://via.placeholder.com/40"
+                                alt="Usuario"
+                                class="w-10 h-10 rounded-full mr-3"
+                            />
+                            <div>
+                                <p class="font-semibold">María García</p>
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="far fa-star text-yellow-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-400">
+                            Muy profesionales y atentos. Recomiendo el servicio de
+                            coloración.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+</body>
+<!-- Pie de página -->
+<Footer/>
+
+@code {
+    
+}

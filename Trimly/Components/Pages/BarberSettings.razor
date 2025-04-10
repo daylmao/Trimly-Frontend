@@ -1,0 +1,278 @@
+@page "/barber/settings"
+
+<body class="min-h-screen bg-background text-text">
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="hidden md:flex md:flex-col w-64 bg-surface border-r border-gray-700">
+        <!-- Logo -->
+        <div class="p-4 border-b border-gray-700">
+            <NavLink href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Trimly
+            </NavLink>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 px-2">
+                <li>
+                    <NavLink href="/barber-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                        Dashboard
+                    </NavLink>
+                </li>
+                
+            </ul>
+
+            <div class="mt-8 px-4">
+                <h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Configuración
+                </h3>
+                <ul class="mt-2 space-y-1">
+                    <li>
+                        <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
+                            Mi Perfil
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
+                            <i class="fas fa-cog w-5 h-5 mr-3"></i>
+                            Ajustes
+                        </NavLink>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- User -->
+        <div class="p-4 border-t border-gray-700">
+            <div class="flex items-center">
+                <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
+                <div>
+                    <p class="text-sm font-medium">Miguel Ángel</p>
+                    <p class="text-xs text-gray-400">Barbero</p>
+                </div>
+                <button id="logout-sidebar-button" class="ml-auto text-gray-400 hover:text-white">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar toggle -->
+    <div class="md:hidden fixed bottom-4 right-4 z-50">
+        <button id="mobile-menu-button" class="bg-primary text-white p-3 rounded-full shadow-lg">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Mobile sidebar (hidden by default) -->
+    <div id="mobile-sidebar" class="fixed inset-0 z-40 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="mobile-sidebar-backdrop"></div>
+        <div class="absolute inset-y-0 left-0 w-64 bg-surface transform transition-transform duration-300 -translate-x-full" id="mobile-sidebar-content">
+            <!-- Mobile sidebar content (same as desktop) -->
+            <!-- Logo -->
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <NavLink href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    Trimly
+                </NavLink>
+                <button id="close-mobile-menu" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 overflow-y-auto py-4">
+                <ul class="space-y-1 px-2">
+                    <li>
+                        <NavLink href="/barber-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                            Dashboard
+                        </NavLink>
+                    </li>
+
+
+                </ul>
+
+                <div class="mt-8 px-4">
+                    <h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Configuración
+                    </h3>
+                    <ul class="mt-2 space-y-1">
+                        <li>
+                            <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                                <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
+                                Mi Perfil
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
+                                <i class="fas fa-cog w-5 h-5 mr-3"></i>
+                                Ajustes
+                            </NavLink>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- User -->
+            <div class="p-4 border-t border-gray-700">
+                <div class="flex items-center">
+                    <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
+                    <div>
+                        <p class="text-sm font-medium">Miguel Ángel</p>
+                        <p class="text-xs text-gray-400">Barbero</p>
+                    </div>
+                    <button id="logout-mobile-button" class="ml-auto text-gray-400 hover:text-white">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top Header -->
+        <header class="bg-surface/80 backdrop-blur-md shadow-md z-10">
+            <div class="px-4 py-4 flex justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-semibold">Ajustes</h1>
+                    <p class="text-sm text-gray-400">Configura tu cuenta y preferencias</p>
+                </div>
+
+                <div class="flex items-center space-x-4">
+
+
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-background p-4">
+            <div class="max-w-4xl mx-auto">
+                <!-- Navegación de Ajustes -->
+                <div class="bg-surface rounded-lg shadow-md p-4 mb-6">
+
+
+                    <!-- Sección de Cuenta -->
+                    <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-lg font-semibold mb-4">Información de Cuenta</h2>
+
+                        <form>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <!-- Información Personal -->
+                                <div class="md:col-span-2">
+                                    <h3 class="text-md font-medium mb-3 pb-2 border-b border-gray-700">Información Personal</h3>
+                                </div>
+
+                                <div>
+                                    <label for="first-name" class="block text-sm text-gray-400 mb-1">Nombre</label>
+                                    <input
+                                        type="text"
+                                        id="first-name"
+                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        value="Miguel"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label for="last-name" class="block text-sm text-gray-400 mb-1">Apellidos</label>
+                                    <input
+                                        type="text"
+                                        id="last-name"
+                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        value="Ángel Gómez"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label for="email" class="block text-sm text-gray-400 mb-1">Email</label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        value="miguel.angel@example.com"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label for="phone" class="block text-sm text-gray-400 mb-1">Teléfono</label>
+                                    <input
+                                        type="tel"
+                                        id="phone"
+                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        value="+34 623 456 789"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label for="birthdate" class="block text-sm text-gray-400 mb-1">Fecha de nacimiento</label>
+                                    <input
+                                        type="date"
+                                        id="birthdate"
+                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        value="1985-06-15"
+                                    />
+                                </div>
+                                
+                            </div>
+
+                            <div class="flex justify-end space-x-3">
+                                <button
+                                    type="button"
+                                    class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-sm"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-md text-sm"
+                                >
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+
+
+                    <!-- Sección de Eliminación de Cuenta -->
+                    <div class="bg-surface rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold mb-4">Eliminar Cuenta</h2>
+
+                        <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-red-500 mt-0.5 mr-3"></i>
+                                <div>
+                                    <p class="font-medium text-red-400">Advertencia: Esta acción es irreversible</p>
+                                    <p class="text-sm text-gray-400 mt-1">
+                                        Al eliminar tu cuenta, perderás acceso a todos tus datos, incluyendo historial de citas, reseñas y configuraciones personales. Esta acción no se puede deshacer.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <button class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-md text-sm">
+                                Eliminar mi cuenta
+                            </button>
+                            <p class="text-xs text-gray-400 ml-3">
+                                Debes contactar con el propietario para completar este proceso.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+
+</body>
+
+
+
+@code {
+    
+}

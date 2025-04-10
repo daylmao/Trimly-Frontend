@@ -1,0 +1,356 @@
+@page "/barber-dashboard"
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+@attribute [Authorize(Roles = ("Barber"))]
+
+<body class="min-h-screen bg-background text-text">
+<div class="flex h-screen overflow-hidden">
+
+    <aside class="hidden md:flex md:flex-col w-64 bg-surface border-r border-gray-700">
+        <div class="p-4 border-b border-gray-700">
+            <a href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Trimly
+            </a>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 px-2">
+                <li>
+                    <NavLink href="/barbero-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
+                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                        Dashboard
+                    </NavLink>
+                </li>
+
+
+            </ul>
+
+            <div class="mt-8 px-4">
+                <h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Configuración
+                </h3>
+                <ul class="mt-2 space-y-1">
+                    <li>
+                        <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
+                            Mi Perfil
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <i class="fas fa-cog w-5 h-5 mr-3"></i>
+                            Ajustes
+                        </NavLink>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- User -->
+        <div class="p-4 border-t border-gray-700">
+            <div class="flex items-center">
+                <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
+                <div>
+                    <p class="text-sm font-medium">Miguel Ángel</p>
+                    <p class="text-xs text-gray-400">Barbero</p>
+                </div>
+                <button id="logout-sidebar-button" class="ml-auto text-gray-400 hover:text-white">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar toggle -->
+    <div class="md:hidden fixed bottom-4 right-4 z-50">
+        <button id="mobile-menu-button" class="bg-primary text-white p-3 rounded-full shadow-lg">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Mobile sidebar (hidden by default) -->
+    <div id="mobile-sidebar" class="fixed inset-0 z-40 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="mobile-sidebar-backdrop"></div>
+        <div class="absolute inset-y-0 left-0 w-64 bg-surface transform transition-transform duration-300 -translate-x-full" id="mobile-sidebar-content">
+            <!-- Mobile sidebar content (same as desktop) -->
+            <!-- Logo -->
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <a href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    Trimly
+                </a>
+                <button id="close-mobile-menu" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 overflow-y-auto py-4">
+                <ul class="space-y-1 px-2">
+                    <li>
+                        <NavLink href="/barbero-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
+                            <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                            Dashboard
+                        </NavLink>
+                    </li>
+
+                </ul>
+
+                <div class="mt-8 px-4">
+                    <h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Configuración
+                    </h3>
+                    <ul class="mt-2 space-y-1">
+                        <li>
+                            <a href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                                <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
+                                Mi Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/barbero/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                                <i class="fas fa-cog w-5 h-5 mr-3"></i>
+                                Ajustes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- User -->
+            <div class="p-4 border-t border-gray-700">
+                <div class="flex items-center">
+                    <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
+                    <div>
+                        <p class="text-sm font-medium">Miguel Ángel</p>
+                        <p class="text-xs text-gray-400">Barbero</p>
+                    </div>
+                    <button @onclick="Logout" id="logout-mobile-button" class="ml-auto text-gray-400 hover:text-white">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top Header -->
+        <header class="bg-surface/80 backdrop-blur-md shadow-md z-10">
+            <div class="px-4 py-4 flex justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-semibold">Dashboard</h1>
+                    <p class="text-sm text-gray-400">Bienvenido, Miguel Ángel</p>
+                </div>
+
+                <div class="flex items-center space-x-4">
+
+
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-background p-4">
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Today's Appointments -->
+                <div class="bg-surface rounded-lg shadow-md p-4">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-primary/10 text-primary mr-4">
+                            <i class="fas fa-calendar-day text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Citas Hoy</p>
+                            <p class="text-2xl font-semibold">5</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Appointments -->
+                <div class="bg-surface rounded-lg shadow-md p-4">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-500/10 text-yellow-500 mr-4">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Citas Pendientes</p>
+                            <p class="text-2xl font-semibold">12</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Today's Schedule -->
+            <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Agenda de Hoy</h2>
+                    <div class="flex items-center text-sm text-gray-400">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        <span id="current-date">15 de Abril, 2023</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                        <tr class="text-left text-xs text-gray-400 border-b border-gray-700">
+                            <th class="pb-3 pl-2">Hora</th>
+                            <th class="pb-3">Cliente</th>
+                            <th class="pb-3">Servicio</th>
+                            <th class="pb-3">Duración</th>
+                            <th class="pb-3">Estado</th>
+                            <th class="pb-3">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 pl-2">
+                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">10:00 AM</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
+                                    <span>Carlos Rodríguez</span>
+                                </div>
+                            </td>
+                            <td class="py-3">Corte de cabello</td>
+                            <td class="py-3">30 min</td>
+                            <td class="py-3">
+                                <span class="px-2 py-1 bg-green-500/20 text-green-500 rounded-full text-xs">Confirmada</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 pl-2">
+                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">11:30 AM</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
+                                    <span>Ana Martínez</span>
+                                </div>
+                            </td>
+                            <td class="py-3">Afeitado tradicional</td>
+                            <td class="py-3">25 min</td>
+                            <td class="py-3">
+                                <span class="px-2 py-1 bg-green-500/20 text-green-500 rounded-full text-xs">Confirmada</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 pl-2">
+                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">12:00 PM</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
+                                    <span>Pedro Sánchez</span>
+                                </div>
+                            </td>
+                            <td class="py-3">Corte y afeitado</td>
+                            <td class="py-3">45 min</td>
+                            <td class="py-3">
+                                <span class="px-2 py-1 bg-blue-500/20 text-blue-500 rounded-full text-xs">En progreso</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 pl-2">
+                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">15:00 PM</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
+                                    <span>Laura García</span>
+                                </div>
+                            </td>
+                            <td class="py-3">Corte de cabello</td>
+                            <td class="py-3">30 min</td>
+                            <td class="py-3">
+                                <span class="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-xs">Pendiente</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 pl-2">
+                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">16:30 PM</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
+                                    <span>Marta López</span>
+                                </div>
+                            </td>
+                            <td class="py-3">Corte y peinado</td>
+                            <td class="py-3">40 min</td>
+                            <td class="py-3">
+                                <span class="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-xs">Pendiente</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+    
+        Navigation.NavigateTo("/login");
+    }
+}

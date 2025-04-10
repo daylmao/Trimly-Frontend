@@ -1,7 +1,307 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<body class="bg-background text-text flex flex-col min-h-screen">
+<!-- Header con navegación moderna -->
+<header class="bg-surface shadow-md sticky top-0 z-50">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex justify-between h-16">
+      
+    <!-- Logo y navegación principal -->
+    <div class="flex items-center">
+      <a href="/" class="flex-shrink-0">
+        <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Trimly</span>
+      </a>
 
-<h1>Hello, world!</h1>
+      <!-- Navegación para pantallas medianas y grandes -->
+      <div class="hidden md:ml-10 md:flex md:space-x-8">
+        <a href="#caracteristicas" class="text-text hover:text-primary px-3 py-2 text-sm font-medium transition duration-300">Características</a>
+        <a href="#como-funciona" class="text-text hover:text-primary px-3 py-2 text-sm font-medium transition duration-300">Cómo Funciona</a>
+        <a href="#testimonios" class="text-text hover:text-primary px-3 py-2 text-sm font-medium transition duration-300">Testimonios</a>
+      </div>
+    </div>
 
-Welcome to your new app.
+    <!-- Botones de acción -->
+    <div class="hidden md:flex items-center space-x-4">
+      <a href="/login" class="text-text px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition duration-300">Iniciar Sesión</a>
+      <a href="/register" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition duration-300">Registrarse</a>
+    </div>
+    
+  </div>
+  </div>
+</header>
+
+<main class="flex-grow">
+  <!-- Hero Section mejorada y centrada -->
+  <section class="relative py-20 md:py-32 bg-surface overflow-hidden">
+    
+    <!-- Elementos decorativos de fondo -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary opacity-10 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary opacity-10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="flex justify-center">
+        <div class="text-center max-w-3xl">
+          <h1
+            class="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Conecta con los
+            <span class="text-primary">mejores barberos</span> de tu ciudad
+          </h1>
+          <p class="text-xl mb-8 text-gray-300">
+            Trimly es la plataforma que revoluciona la forma de reservar
+            citas con tu barbero favorito.
+          </p>
+          <a href="/login" class="bg-primary text-white px-8 py-4 rounded-md text-lg font-medium hover:bg-purple-700 transition duration-300 inline-flex items-center">
+            <i class="fas fa-sign-in-alt mr-2"></i>
+            Iniciar Sesión
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Características -->
+  <section id="caracteristicas" class="py-20">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">¿Por qué elegir Trimly?</h2>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+          Nuestra plataforma ofrece herramientas innovadoras para barberos y
+          clientes
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-12">
+        <div
+          class="bg-surface p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
+          <div
+            class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-calendar-alt text-3xl text-primary"></i>
+          </div>
+          <h3 class="text-2xl font-semibold mb-4">Gestión de Citas</h3>
+          <p class="text-gray-400 text-lg">
+            Organiza tu agenda de manera eficiente y nunca pierdas una cita.
+            Recibe recordatorios automáticos.
+          </p>
+        </div>
+        <div
+          class="bg-surface p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
+          <div
+            class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-users text-3xl text-primary"></i>
+          </div>
+          <h3 class="text-2xl font-semibold mb-4">Amplía tu Clientela</h3>
+          <p class="text-gray-400 text-lg">
+            Llega a nuevos clientes y haz crecer tu negocio con nuestra
+            plataforma de alta visibilidad.
+          </p>
+        </div>
+        <div
+          class="bg-surface p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
+          <div
+            class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-star text-3xl text-primary"></i>
+          </div>
+          <h3 class="text-2xl font-semibold mb-4">
+            Reseñas y Calificaciones
+          </h3>
+          <p class="text-gray-400 text-lg">
+            Construye tu reputación con las opiniones de tus clientes
+            satisfechos y destaca entre la competencia.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cómo Funciona -->
+  <section id="como-funciona" class="py-20 bg-surface">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Cómo Funciona</h2>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+          Comienza a usar Trimly en cuatro sencillos pasos
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-4 gap-8">
+        <div class="text-center relative">
+          <div
+            class="bg-primary rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 relative z-10">
+            <i class="fas fa-user-plus text-2xl text-white"></i>
+          </div>
+          <!-- Línea conectora (visible solo en desktop) -->
+          <div
+            class="hidden md:block absolute top-10 left-1/2 w-full h-0.5 bg-primary/30 -z-0"></div>
+          <h3 class="text-xl font-semibold mb-4">1. Regístrate</h3>
+          <p class="text-gray-400">
+            Crea tu perfil de barbero o usuario en minutos.
+          </p>
+        </div>
+        <div class="text-center relative">
+          <div
+            class="bg-primary rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 relative z-10">
+            <i class="fas fa-calendar-plus text-2xl text-white"></i>
+          </div>
+          <!-- Línea conectora (visible solo en desktop) -->
+          <div
+            class="hidden md:block absolute top-10 left-1/2 w-full h-0.5 bg-primary/30 -z-0"></div>
+          <h3 class="text-xl font-semibold mb-4">2. Configura tu Agenda</h3>
+          <p class="text-gray-400">
+            Barberos: Establezcan sus horarios y servicios disponibles.
+          </p>
+        </div>
+        <div class="text-center relative">
+          <div
+            class="bg-primary rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 relative z-10">
+            <i class="fas fa-search text-2xl text-white"></i>
+          </div>
+          <!-- Línea conectora (visible solo en desktop) -->
+          <div
+            class="hidden md:block absolute top-10 left-1/2 w-full h-0.5 bg-primary/30 -z-0"></div>
+          <h3 class="text-xl font-semibold mb-4">3. Busca o Comparte</h3>
+          <p class="text-gray-400">
+            Usuarios: Encuentren barberos. Barberos: Compartan su perfil.
+          </p>
+        </div>
+        <div class="text-center">
+          <div
+            class="bg-primary rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-cut text-2xl text-white"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-4">
+            4. ¡Disfruta el Servicio!
+          </h3>
+          <p class="text-gray-400">
+            Reserva citas fácilmente y recibe excelentes cortes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Estadísticas -->
+  <section class="py-16 bg-gradient-to-r from-primary/20 to-secondary/20">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div>
+          <p class="text-4xl font-bold text-primary mb-2">10k+</p>
+          <p class="text-gray-300">Usuarios Activos</p>
+        </div>
+        <div>
+          <p class="text-4xl font-bold text-primary mb-2">500+</p>
+          <p class="text-gray-300">Barberías</p>
+        </div>
+        <div>
+          <p class="text-4xl font-bold text-primary mb-2">50k+</p>
+          <p class="text-gray-300">Citas Reservadas</p>
+        </div>
+        <div>
+          <p class="text-4xl font-bold text-primary mb-2">4.8</p>
+          <p class="text-gray-300">Calificación Promedio</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonios -->
+  <section id="testimonios" class="py-20">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">
+          Lo que dicen nuestros usuarios
+        </h2>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+          Historias de éxito de barberos y clientes que usan Trimly
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-surface p-8 rounded-xl shadow-lg">
+          <div class="flex mb-4">
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+          </div>
+          <p class="text-gray-400 text-lg mb-6">
+            "Trimly ha revolucionado la forma en que manejo mis citas.
+            ¡Ahora tengo más tiempo para concentrarme en mis clientes y mi
+            negocio ha crecido un 40%!"
+          </p>
+          <div class="flex items-center">
+            <img
+              src="https://via.placeholder.com/60"
+              alt="Avatar"
+              class="rounded-full w-16 h-16 mr-4 border-2 border-primary"/>
+            <div>
+              <h4 class="font-semibold text-xl">Carlos Rodríguez</h4>
+              <p class="text-gray-400">Barbero Profesional</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-surface p-8 rounded-xl shadow-lg">
+          <div class="flex mb-4">
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+          </div>
+          <p class="text-gray-400 text-lg mb-6">
+            "Desde que uso Trimly, mi negocio ha crecido un 30%. La
+            plataforma es fácil de usar y mis clientes la adoran. Las
+            notificaciones automáticas han reducido las cancelaciones."
+          </p>
+          <div class="flex items-center">
+            <img src="https://via.placeholder.com/60" alt="Avatar" class="rounded-full w-16 h-16 mr-4 border-2 border-primary"/>
+            <div>
+              <h4 class="font-semibold text-xl">Ana Martínez</h4>
+              <p class="text-gray-400">Propietaria de Barbería</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-surface p-8 rounded-xl shadow-lg">
+          <div class="flex mb-4">
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star text-yellow-400"></i>
+            <i class="fas fa-star-half-alt text-yellow-400"></i>
+          </div>
+          <p class="text-gray-400 text-lg mb-6">
+            "Como cliente, Trimly me ha facilitado enormemente encontrar y
+            reservar con los mejores barberos de mi zona. La aplicación es
+            intuitiva y los recordatorios son muy útiles."
+          </p>
+          <div class="flex items-center">
+            <img src="https://via.placeholder.com/60" alt="Avatar" class="rounded-full w-16 h-16 mr-4 border-2 border-primary"/>
+            <div>
+              <h4 class="font-semibold text-xl">Miguel Sánchez</h4>
+              <p class="text-gray-400">Cliente</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 bg-surface">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-4xl font-bold mb-6">¿Listo para comenzar?</h2>
+      <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+        Únete a miles de barberos y clientes que ya están disfrutando de
+        Trimly
+      </p>
+      <a href="/login" class="bg-primary text-white px-8 py-4 rounded-md text-lg font-medium hover:bg-purple-700 transition duration-300 inline-flex items-center">
+        <i class="fas fa-sign-in-alt mr-2"></i>
+        Iniciar Sesión
+      </a>
+    </div>
+  </section>
+</main>
+<Footer/>
+</body>
