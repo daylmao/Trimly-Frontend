@@ -1,7 +1,7 @@
 @page "/login"
 @using System.Security.Claims
 @inject IAuthService AuthService
-@inject CustomAuthStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
 @inject NavigationManager Navigation
 @inject ILogger<Login> Logger
 
@@ -85,6 +85,7 @@
             <div class="text-center text-sm text-gray-400">
                 ¿No tienes una cuenta? <a href="/register" class="text-primary hover:underline">Regístrate</a>
             </div>
+
         </div>
     </main>
 
@@ -108,10 +109,13 @@
             var token = await AuthService.AuthenticateAsync(request.Email, request.Password);
             if (!string.IsNullOrEmpty(token))
             {
-
                 var claims = CustomAuthStateProvider.ParseClaimsFromJwt(token);
                 var roles = claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
-                
+                var userIdClaim = claims.FirstOrDefault(c => c.Type == "Id");
+                if (userIdClaim != null)
+                {
+                    await LocalStorage.SetItemAsync("userId", userIdClaim.Value);
+                }
 
                 if (roles.Contains("Owner"))
                 {
@@ -119,7 +123,7 @@
                 }
                 else if (roles.Contains("Barber"))
                 {
-                    Navigation.NavigateTo("/barber/home", forceLoad: true);
+                    Navigation.NavigateTo("/barber-dashboard", forceLoad: true);
                 }
                 else if (roles.Contains("Client"))
                 {

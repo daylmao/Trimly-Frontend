@@ -1,7 +1,9 @@
+using System.IdentityModel.Tokens.Jwt;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.WebUtilities;
 
 public class CustomAuthStateProvider : AuthenticationStateProvider
 {
@@ -16,12 +18,20 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var token = await _localStorage.GetItemAsync<string>(AuthTokenKey);
-        
+    
         if (string.IsNullOrEmpty(token)) 
             return CreateAnonymousState();
 
         try
         {
+            var jwtToken = new JwtSecurityToken(token);
+        
+            if (jwtToken.ValidTo < DateTime.UtcNow)
+            {
+                await ClearAuthDataAsync();
+                return CreateAnonymousState();
+            }
+
             var claims = ParseClaimsFromJwt(token);
             var identity = CreateClaimsIdentity(claims);
             return new AuthenticationState(new ClaimsPrincipal(identity));
@@ -32,18 +42,35 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
             return CreateAnonymousState();
         }
     }
+
     
     public async Task MarkUserAsAuthenticated(string token)
     {
-        await _localStorage.SetItemAsync(AuthTokenKey, token);
-        var claims = ParseClaimsFromJwt(token);
-        var identity = CreateClaimsIdentity(claims);
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal(identity))));
+        try
+        {
+            var jwtToken = new JwtSecurityToken(token);
+            if (jwtToken.ValidTo < DateTime.UtcNow)
+            {
+                await ClearAuthDataAsync();
+                return;
+            }
+
+            await _localStorage.SetItemAsync(AuthTokenKey, token);
+            var claims = ParseClaimsFromJwt(token);
+            var identity = CreateClaimsIdentity(claims);
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal(identity))));
+        }
+        catch
+        {
+            await ClearAuthDataAsync();
+        }
     }
 
     public async Task ClearAuthDataAsync()
     {
-        await _localStorage.RemoveItemAsync(AuthTokenKey);
+        await _localStorage.ClearAsync();
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
     }
 
     public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
@@ -115,6 +142,22 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
     private static byte[] Base64UrlDecode(string input)
     {
-        return Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlDecode(input);
+        return WebEncoders.Base64UrlDecode(input);
+    }
+    
+    private bool IsTokenValid(string token)
+    {
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(token)) return false;
+        
+            var jwtToken = handler.ReadJwtToken(token);
+            return jwtToken.ValidTo > DateTime.UtcNow;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

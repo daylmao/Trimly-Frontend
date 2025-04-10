@@ -154,9 +154,9 @@
         try
         {
             var response = await AuthService.RegisterAsync(RoleEndpoints[_selectedRole], _request);
-            if (!string.IsNullOrEmpty(response.UserId))
+            if (!string.IsNullOrEmpty(response.Data.UserId))
             {
-                await LocalStorage.SetItemAsync("userId", response.UserId);
+                await LocalStorage.SetItemAsync("userId", response.Data.UserId);
                 NavigationManager.NavigateTo("/confirm-account", forceLoad: true);
             }
             else
