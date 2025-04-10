@@ -1,4 +1,4 @@
-@page "/barbers/settings"
+@page "/barber/settings"
 
 <body class="min-h-screen bg-background text-text">
 <div class="flex h-screen overflow-hidden">
@@ -20,12 +20,6 @@
                         Dashboard
                     </NavLink>
                 </li>
-                <li>
-                    <NavLink href="/barbers/appointment" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                        <i class="fas fa-calendar-alt w-5 h-5 mr-3"></i>
-                        Mis Citas
-                    </NavLink>
-                </li>
                 
             </ul>
 
@@ -35,13 +29,13 @@
                 </h3>
                 <ul class="mt-2 space-y-1">
                     <li>
-                        <NavLink href="/barbers/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                        <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                             <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
                             Mi Perfil
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink href="/barbers/settings" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
+                        <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
                             <i class="fas fa-cog w-5 h-5 mr-3"></i>
                             Ajustes
                         </NavLink>
@@ -96,12 +90,6 @@
                             Dashboard
                         </NavLink>
                     </li>
-                    <li>
-                        <NavLink href="/barbers/appointment" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                            <i class="fas fa-calendar-alt w-5 h-5 mr-3"></i>
-                            Mis Citas
-                        </NavLink>
-                    </li>
 
 
                 </ul>
@@ -112,13 +100,13 @@
                     </h3>
                     <ul class="mt-2 space-y-1">
                         <li>
-                            <NavLink href="/barbers/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                                 <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
                                 Mi Perfil
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink href="/barbers/settings" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
+                            <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
                                 <i class="fas fa-cog w-5 h-5 mr-3"></i>
                                 Ajustes
                             </NavLink>
@@ -227,48 +215,7 @@
                                         value="1985-06-15"
                                     />
                                 </div>
-
-                                <div>
-                                    <label for="gender" class="block text-sm text-gray-400 mb-1">Género</label>
-                                    <select id="gender" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                                        <option value="male" selected>Masculino</option>
-                                        <option value="female">Femenino</option>
-                                        <option value="other">Otro</option>
-                                        <option value="prefer-not-to-say">Prefiero no decirlo</option>
-                                    </select>
-                                </div>
-
-
-
-                                <!-- Foto de Perfil -->
-                                <div class="md:col-span-2">
-                                    <h3 class="text-md font-medium mb-3 pb-2 border-b border-gray-700">Foto de Perfil</h3>
-                                </div>
-
-                                <div class="md:col-span-2 flex flex-col md:flex-row gap-6 items-center">
-                                    <div class="flex-shrink-0">
-                                        <img src="https://via.placeholder.com/150" alt="Foto de perfil" class="w-32 h-32 rounded-full object-cover border-2 border-gray-600">
-                                    </div>
-
-                                    <div class="flex-1">
-                                        <p class="text-sm mb-3">Sube una foto clara de tu rostro. Esto ayudará a los clientes a reconocerte.</p>
-
-                                        <div class="flex flex-wrap gap-3">
-                                            <label for="profile-photo" class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-md text-sm cursor-pointer">
-                                                <i class="fas fa-upload mr-2"></i>
-                                                Subir nueva foto
-                                            </label>
-                                            <input type="file" id="profile-photo" class="hidden" accept="image/*" />
-
-                                            <button type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-sm">
-                                                <i class="fas fa-trash mr-2"></i>
-                                                Eliminar
-                                            </button>
-                                        </div>
-
-                                        <p class="text-xs text-gray-400 mt-2">Formatos permitidos: JPG, PNG. Tamaño máximo: 5MB.</p>
-                                    </div>
-                                </div>
+                                
                             </div>
 
                             <div class="flex justify-end space-x-3">

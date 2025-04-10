@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
-@attribute [Authorize(Roles = nameof(Roles.Barber))]
+@attribute [Authorize(Roles = ("Barber"))]
 
 <body class="min-h-screen bg-background text-text">
 <div class="flex h-screen overflow-hidden">
@@ -17,17 +17,12 @@
         <nav class="flex-1 overflow-y-auto py-4">
             <ul class="space-y-1 px-2">
                 <li>
-                    <a href="/barbero-dashboard.html" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
+                    <NavLink href="/barbero-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
                         <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
                         Dashboard
-                    </a>
+                    </NavLink>
                 </li>
-                <li>
-                    <a href="/barbero-citas.html" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                        <i class="fas fa-calendar-alt w-5 h-5 mr-3"></i>
-                        Mis Citas
-                    </a>
-                </li>
+
 
             </ul>
 
@@ -37,13 +32,13 @@
                 </h3>
                 <ul class="mt-2 space-y-1">
                     <li>
-                        <NavLink href="/barbers/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                        <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                             <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
                             Mi Perfil
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink href="/barbers/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                        <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                             <i class="fas fa-cog w-5 h-5 mr-3"></i>
                             Ajustes
                         </NavLink>
@@ -98,12 +93,6 @@
                             Dashboard
                         </NavLink>
                     </li>
-                    <li>
-                        <NavLink href="/barbero-citas" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                            <i class="fas fa-calendar-alt w-5 h-5 mr-3"></i>
-                            Mis Citas
-                        </NavLink>
-                    </li>
 
                 </ul>
 
@@ -113,13 +102,13 @@
                     </h3>
                     <ul class="mt-2 space-y-1">
                         <li>
-                            <a href="/barbero-perfil.html" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <a href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                                 <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
                                 Mi Perfil
                             </a>
                         </li>
                         <li>
-                            <a href="/barbero-ajustes.html" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <a href="/barbero/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                                 <i class="fas fa-cog w-5 h-5 mr-3"></i>
                                 Ajustes
                             </a>
@@ -235,9 +224,6 @@
                             <td class="py-3">
                                 <div class="flex space-x-2">
                                     <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="text-gray-400 hover:text-white">
                                         <i class="fas fa-check-circle"></i>
                                     </button>
                                     <button class="text-gray-400 hover:text-white">
@@ -263,9 +249,6 @@
                             </td>
                             <td class="py-3">
                                 <div class="flex space-x-2">
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
                                     <button class="text-gray-400 hover:text-white">
                                         <i class="fas fa-check-circle"></i>
                                     </button>
@@ -293,9 +276,6 @@
                             <td class="py-3">
                                 <div class="flex space-x-2">
                                     <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="text-gray-400 hover:text-white">
                                         <i class="fas fa-check-circle"></i>
                                     </button>
                                     <button class="text-gray-400 hover:text-white">
@@ -321,9 +301,6 @@
                             </td>
                             <td class="py-3">
                                 <div class="flex space-x-2">
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
                                     <button class="text-gray-400 hover:text-white">
                                         <i class="fas fa-check-circle"></i>
                                     </button>
@@ -351,9 +328,6 @@
                             <td class="py-3">
                                 <div class="flex space-x-2">
                                     <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="text-gray-400 hover:text-white">
                                         <i class="fas fa-check-circle"></i>
                                     </button>
                                     <button class="text-gray-400 hover:text-white">
@@ -364,58 +338,6 @@
                         </tr>
                         </tbody>
                     </table>
-                </div>
-
-                <div class="mt-4 text-center">
-                    <a href="/barbero-citas.html" class="text-primary hover:text-primary/80 text-sm">
-                        Ver todas las citas
-                    </a>
-                </div>
-            </div>
-
-            <!-- Upcoming Week -->
-            <div class="bg-surface rounded-lg shadow-md p-6">
-                <h2 class="text-lg font-semibold mb-4">Próxima Semana</h2>
-
-                <div class="space-y-4">
-                    <div class="bg-gray-700/30 rounded-lg p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-medium">Lunes, 17 de Abril</h3>
-                            <span class="text-sm text-gray-400">4 citas</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span>Primera cita: 9:30 AM</span>
-                            <span>Última cita: 5:00 PM</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-700/30 rounded-lg p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-medium">Martes, 18 de Abril</h3>
-                            <span class="text-sm text-gray-400">6 citas</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span>Primera cita: 10:00 AM</span>
-                            <span>Última cita: 6:30 PM</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-700/30 rounded-lg p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-medium">Miércoles, 19 de Abril</h3>
-                            <span class="text-sm text-gray-400">5 citas</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span>Primera cita: 9:00 AM</span>
-                            <span>Última cita: 4:30 PM</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 text-center">
-                    <a href="/barbero-citas.html" class="text-primary hover:text-primary/80 text-sm">
-                        Ver calendario completo
-                    </a>
                 </div>
             </div>
         </main>
