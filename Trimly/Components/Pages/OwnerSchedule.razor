@@ -1,0 +1,1533 @@
+@page "/owner/schedule"
+@using System.Data.SqlTypes
+@using Trimly.Core.Application.DTOs
+@using Trimly.Core.Application.DTOs.Companies
+@using Trimly.Core.Application.DTOs.Schedules
+@using Trimly.Core.Application.DTOs.Services
+@using Trimly.Infrastructure.Api
+@inject IRegisteredCompanyService RegisteredCompanyService
+@inject IScheduleService ScheduleService
+@inject IServices Services
+@inject ILocalStorageService LocalStorage
+
+<div class="min-h-screen bg-background text-text">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-col w-64 bg-surface border-r border-gray-700">
+            <!-- Logo -->
+            <div class="p-4 border-b border-gray-700">
+                <a href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    Trimly
+                </a>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 overflow-y-auto py-4">
+                <ul class="space-y-1 px-2">
+                    <li>
+                        <a href="/owner-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/owner/companies" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <i class="fas fa-store w-5 h-5 mr-3"></i>
+                            Mis Barberías
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/owner/barberos" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <i class="fas fa-cut w-5 h-5 mr-3"></i>
+                            Barberos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/owner/schedule" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
+                            <i class="fas fa-clock w-5 h-5 mr-3"></i>
+                            Horarios
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/owner/appointments" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <i class="fas fa-calendar-alt w-5 h-5 mr-3"></i>
+                            Citas
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/owner/reviews" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                            <i class="fas fa-star w-5 h-5 mr-3"></i>
+                            Reseñas
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="mt-8 px-4">
+                    <h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Configuración
+                    </h3>
+                    <ul class="mt-2 space-y-1">
+                        <li>
+                            <a href="/owner/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                                <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
+                                Mi Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/owner/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                                <i class="fas fa-cog w-5 h-5 mr-3"></i>
+                                Ajustes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- User -->
+            <div class="px-4 py-3 border-t border-gray-800/50 bg-gradient-to-r from-gray-900/50 to-gray-800/20">
+                <div class="flex items-center justify-between">
+
+                    <div class="relative">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_12px_-2px_rgba(99,102,241,0.5)] group-hover:shadow-[0_0_16px_-1px_rgba(99,102,241,0.7)] transition-all duration-500">
+                            <i class="fas fa-user-astronaut text-sm text-white/90"></i>
+                        </div>
+                        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 border-2 border-gray-900 animate-pulse"></div>
+                    </div>
+
+                    <div class="flex-1 px-3 overflow-hidden">
+                        <p class="text-sm font-medium tracking-wide text-gray-100 truncate">
+                            Mi Cuenta
+                        </p>
+                        <p class="text-xs text-purple-300/80 font-medium truncate">
+                            Propietario
+                        </p>
+                    </div>
+
+                    <button @onclick="Logout"
+                            class="p-2 rounded-full group transition-all duration-300 hover:bg-purple-900/20"
+                            title="Cerrar sesión">
+                        <div class="relative">
+                            <i class="fas fa-arrow-right-from-bracket text-gray-400 group-hover:text-purple-300 group-hover:scale-110 transition-all duration-300"></i>
+                            <div class="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_12px_3px_rgba(196,181,253,0.4)] transition-all duration-500"></div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Header -->
+            <header class="bg-surface/80 backdrop-blur-md shadow-md z-10">
+                <div class="px-4 py-4 flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl font-semibold">Gestión de Horarios y Servicios</h1>
+                        <p class="text-sm text-gray-400">Configura horarios y servicios de tus barberías</p>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        <div class="bg-green-500/10 text-green-500 px-4 py-2 rounded-md text-sm flex items-center">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            @successMessage
+                            <button @onclick="() => successMessage = null" class="ml-3 text-green-400 hover:text-green-300">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    }
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto bg-background p-6">
+                <!-- Lista de Barberías -->
+                <div class="bg-surface border border-white/5 rounded-3xl shadow-md p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-white">Mis Barberías</h2>
+                    </div>
+
+                    @if (isLoading && barbershops.Count == 0)
+                    {
+                        <div class="flex flex-col items-center justify-center h-64">
+                            <div class="relative w-16 h-16 mb-4">
+                                <div class="absolute inset-0 bg-primary/10 rounded-full animate-ping"></div>
+                                <div class="relative z-10 flex items-center justify-center bg-primary/20 text-primary rounded-full w-full h-full">
+                                    <i class="fas fa-spinner fa-spin text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="text-gray-400">Cargando barberías...</span>
+                        </div>
+                    }
+                    else if (!barbershops.Any())
+                    {
+                        <div class="bg-surface rounded-3xl p-10 text-center space-y-6 border border-white/5">
+                            <div class="relative w-24 h-24 mx-auto">
+                                <div class="absolute inset-0 bg-primary/10 rounded-full animate-ping"></div>
+                                <div class="relative z-10 flex items-center justify-center bg-primary/20 text-primary rounded-full w-full h-full">
+                                    <i class="fas fa-store-slash text-3xl"></i>
+                                </div>
+                            </div>
+                            <h2 class="text-2xl font-bold text-primary">Sin barberías registradas</h2>
+                            <p class="text-gray-500 mb-6 text-sm">
+                                Aún no has creado ninguna barbería.<br />
+                                Empieza ahora para administrar tu negocio.
+                            </p>
+                            <NavLink href="owner/companies"
+                                     class="w-fit mx-auto px-5 py-2.5 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white rounded-lg font-medium flex items-center justify-center transition-all shadow-lg shadow-primary/10">
+                                <i class="fas fa-plus mr-2"></i>
+                                Añadir barbería
+                            </NavLink>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            @foreach (var barbershop in barbershops)
+                            {
+                                <div class="bg-surface border border-white/5 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group">
+                                    <div class="h-48 bg-gray-800 overflow-hidden relative">
+                                        <img src="@(barbershop.LogoUrl ?? "https://images.unsplash.com/photo-1599351431405-41e8b8f796d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80")"
+                                             alt="@barbershop.Name - Barbería"
+                                             class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                             loading="lazy">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
+                                    </div>
+
+                                    <div class="p-6">
+                                        <div class="mb-5">
+                                            <h3 class="text-lg font-bold text-white mb-2 truncate">@barbershop.Name</h3>
+                                            <div class="flex items-center text-sm text-gray-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                </svg>
+                                                <span class="truncate">@barbershop.AddresCompanies</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-col space-y-3">
+                                            <!-- Botones para horarios -->
+                                            <div class="flex space-x-3">
+                                                <button @onclick="() => ShowViewScheduleModal(barbershop)"
+                                                        class="flex-1 bg-gray-700 hover:bg-gray-600/90 text-white px-3 py-2.5 rounded-lg text-sm flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    Horarios
+                                                </button>
+                                                <button @onclick="() => ShowCreateScheduleModal(barbershop)"
+                                                        class="flex-1 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white px-3 py-2.5 rounded-lg text-sm flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-md shadow-primary/10">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                                    </svg>
+                                                    Agregar
+                                                </button>
+                                            </div>
+
+                                            <!-- Botones para servicios -->
+                                            <div class="flex space-x-3">
+                                                <button @onclick="() => ShowViewServiceModal(barbershop)"
+                                                        class="flex-1 bg-gray-700 hover:bg-gray-600/90 text-white px-3 py-2.5 rounded-lg text-sm flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm">
+                                                    <i class="fas fa-scissors mr-2 text-sm"></i>
+                                                    Servicios
+                                                </button>
+                                                <button @onclick="() => ShowCreateServiceModal(barbershop)"
+                                                        class="flex-1 bg-gradient-to-r from-secondary to-purple-600 hover:from-secondary/90 hover:to-purple-600/90 text-white px-3 py-2.5 rounded-lg text-sm flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-secondary/50 shadow-md shadow-secondary/10">
+                                                    <i class="fas fa-plus mr-2 text-sm"></i>
+                                                    Agregar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </main>        </div>
+
+        <!-- Modal para VER horario -->
+        @if (showViewScheduleModal && selectedBarbershopForModal != null)
+        {
+            <div class="fixed inset-0 z-50">
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @onclick="CloseViewModal"></div>
+                <div class="absolute inset-0 flex items-center justify-center p-4">
+                    <div class="bg-surface rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+                        <!-- Encabezado -->
+                        <div class="p-6 border-b border-gray-700 flex justify-between items-center bg-gradient-to-r from-gray-900 to-gray-800">
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Horarios de @selectedBarbershopForModal.Name</h3>
+                                <p class="text-sm text-gray-300">Configuración de horarios de atención</p>
+                            </div>
+                            <button @onclick="CloseViewModal"
+                                    class="p-2 rounded-full hover:bg-gray-700 transition-colors text-gray-300 hover:text-white">
+                                <i class="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+
+                        <!-- Contenido -->
+                        <div class="flex-1 overflow-y-auto">
+                            @if (isLoading)
+                            {
+                                <div class="flex flex-col items-center justify-center p-12">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
+                                    <p class="text-gray-400">Cargando horarios...</p>
+                                </div>
+                            }
+                            else if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="flex flex-col items-center justify-center p-12 text-center">
+                                    <div class="w-20 h-20 bg-red-900/20 rounded-full flex items-center justify-center mb-5 mx-auto">
+                                        <i class="fas fa-exclamation-triangle text-2xl text-red-400"></i>
+                                    </div>
+                                    <h4 class="text-lg font-medium text-white mb-2">Error al cargar horarios</h4>
+                                    <p class="text-red-400 max-w-md mx-auto mb-6">@errorMessage</p>
+                                </div>
+                            }
+                            else if (currentSchedules.Any())
+                            {
+                                <div class="p-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        @foreach (var schedule in currentSchedules)
+                                        {
+                                            <div class="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700 hover:border-primary/50 transition-all duration-300 shadow-lg">
+                                                <!-- Encabezado de la tarjeta -->
+                                                <div class="px-5 py-4 border-b border-gray-700 bg-gray-900/20">
+                                                    <div class="flex justify-between items-center">
+                                                        <h4 class="font-bold text-white text-lg">@schedule.days</h4>
+                                                        <span class="@(schedule.IsHoliday == Status.Activated ? "bg-red-600/20 text-red-400" : "bg-green-600/20 text-green-400") px-3 py-1 rounded-full text-xs font-semibold">
+                                                    @(schedule.IsHoliday == Status.Activated ? "Día festivo" : "Día laboral")
+                                                </span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Detalles del horario -->
+                                                <div class="p-5">
+                                                    <div class="grid grid-cols-2 gap-4 mb-4">
+                                                        <div>
+                                                            <label class="block text-xs font-medium text-gray-400 mb-1">Hora de apertura</label>
+                                                            <p class="text-lg font-bold text-white">@schedule.OpeningTime.ToString("hh\\:mm")</p>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-xs font-medium text-gray-400 mb-1">Hora de cierre</label>
+                                                            <p class="text-lg font-bold text-white">@schedule.ClosingTime.ToString("hh\\:mm")</p>
+                                                        </div>
+                                                    </div>
+
+                                                    @if (!string.IsNullOrEmpty(schedule.Notes))
+                                                    {
+                                                        <div class="mt-4 pt-4 border-t border-gray-700">
+                                                            <label class="block text-xs font-medium text-gray-400 mb-2">Notas adicionales</label>
+                                                            <p class="text-sm text-gray-300">@schedule.Notes</p>
+                                                        </div>
+                                                    }
+
+                                                    <!-- Acciones -->
+                                                    <div class="mt-5 flex justify-end space-x-3">
+                                                        <button @onclick="() => ShowEditScheduleModal(schedule)"
+                                                                class="px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 rounded-lg text-sm font-medium flex items-center transition-all"
+                                                                title="Editar horario">
+                                                            <i class="fas fa-pencil-alt mr-2"></i> Editar
+                                                        </button>
+                                                        <button @onclick="() => ShowDeleteConfirmation(schedule)"
+                                                                class="px-4 py-2 bg-red-600/10 hover:bg-red-600/20 text-red-400 rounded-lg text-sm font-medium flex items-center transition-all"
+                                                                title="Eliminar horario">
+                                                            <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex flex-col items-center justify-center p-12 text-center">
+                                    <div class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-5 mx-auto">
+                                        <i class="fas fa-clock text-2xl text-gray-500"></i>
+                                    </div>
+                                    <h4 class="text-lg font-medium text-white mb-2">No hay horarios configurados</h4>
+                                    <p class="text-gray-400 max-w-md mx-auto mb-6">Añade horarios de atención para que tus clientes sepan cuándo pueden visitar la barbería</p>
+                                    <button @onclick="() => ShowCreateScheduleModal(selectedBarbershopForModal)"
+                                            class="px-5 py-2.5 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white rounded-lg font-medium flex items-center transition-all">
+                                        <i class="fas fa-plus mr-2"></i> Crear primer horario
+                                    </button>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Footer - Mostrar solo si hay horarios -->
+                        @if (currentSchedules.Any())
+                        {
+                            <div class="p-4 border-t border-gray-700 bg-gray-900/50 flex justify-end">
+                                <button @onclick="() => ShowCreateScheduleModal(selectedBarbershopForModal)"
+                                        class="px-5 py-2.5 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white rounded-lg text-sm font-medium flex items-center transition-all shadow-lg shadow-primary/10">
+                                    <i class="fas fa-plus mr-2"></i> Nuevo Horario
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Modal para CREAR horario -->
+        @if (showCreateScheduleModal)
+        {
+        <div class="fixed inset-0 z-50">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @onclick="CloseCreateModal"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="bg-surface rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+                    <!-- Encabezado -->
+                    <div class="p-6 border-b border-gray-700 flex justify-between items-center bg-gradient-to-r from-gray-900 to-gray-800">
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Crear Nuevo Horario</h3>
+                            <p class="text-sm text-gray-300">Configura los horarios de atención</p>
+                        </div>
+                        <button @onclick="CloseCreateModal" 
+                                class="p-2 rounded-full hover:bg-gray-700 transition-colors text-gray-300 hover:text-white">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- Contenido -->
+                    <div class="flex-1 overflow-y-auto p-6">
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start">
+                                <i class="fas fa-exclamation-circle text-red-400 mt-1 mr-3"></i>
+                                <div>
+                                    <p class="font-medium text-red-400">Error</p>
+                                    <p class="text-sm text-red-300">@errorMessage</p>
+                                </div>
+                            </div>
+                        }
+
+                        <EditForm Model="@_createScheduleDto" OnValidSubmit="@HandleCreateSubmit">
+                            <DataAnnotationsValidator />
+
+                            <div class="space-y-5">
+                                <!-- Barbería -->
+                                <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                                    <label class="block text-xs font-medium text-gray-400 mb-1">BARBERÍA</label>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-store text-gray-400 mr-3"></i>
+                                        <p class="font-medium text-white">@selectedBarbershopForModal?.Name</p>
+                                    </div>
+                                </div>
+
+                                <!-- Días de la semana -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Día de la semana *</label>
+                                    <InputSelect @bind-Value="_createScheduleDto.days" 
+                                               class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                                        <option value="" class="text-gray-500">-- Selecciona un día --</option>
+                                        @foreach (var day in Enum.GetValues(typeof(Weekday)))
+                                        {
+                                            <option value="@day.ToString()" class="text-white">@day.ToString()</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => _createScheduleDto.days)" class="text-red-400 text-xs mt-1" />
+                                </div>
+
+                                <!-- Horario -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Hora de apertura *</label>
+                                        <input type="time" @bind="_createScheduleDto.OpeningTime" 
+                                               class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" />
+                                        <ValidationMessage For="@(() => _createScheduleDto.OpeningTime)" class="text-red-400 text-xs mt-1" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Hora de cierre *</label>
+                                        <input type="time" @bind="_createScheduleDto.ClosingTime" 
+                                               class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" />
+                                        <ValidationMessage For="@(() => _createScheduleDto.ClosingTime)" class="text-red-400 text-xs mt-1" />
+                                    </div>
+                                </div>
+
+                                <!-- Notas -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Notas</label>
+                                    <InputTextArea @bind-Value="_createScheduleDto.Notes" rows="3"
+                                                   class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                                   placeholder="Ej: Horario especial los viernes, descanso entre 13:00-14:00, etc." />
+                                </div>
+                            </div>
+
+                            <!-- Footer con botones -->
+                            <div class="mt-8 pt-5 border-t border-gray-700 flex justify-end space-x-3">
+                                <button type="button" @onclick="CloseCreateModal"
+                                        class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-all">
+                                    Cancelar
+                                </button>
+                                <button type="submit" disabled="@isLoading"
+                                        class="px-5 py-2.5 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white rounded-lg font-medium flex items-center transition-all shadow-lg shadow-primary/10">
+                                    @if (isLoading)
+                                    {
+                                        <span class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></span>
+                                        <span>Guardando...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-save mr-2"></i>
+                                        <span>Guardar Horario</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+        @if (showViewServiceModal && selectedBarbershopForModal != null)
+        {
+            <div class="fixed inset-0 z-50">
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @onclick="CloseViewServiceModal"></div>
+                <div class="absolute inset-0 flex items-center justify-center p-4">
+                    <div class="bg-surface rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+                        <!-- Encabezado -->
+                        <div class="p-6 border-b border-gray-700 flex justify-between items-center bg-gradient-to-r from-gray-900 to-gray-800">
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Servicios de @selectedBarbershopForModal.Name</h3>
+                                <p class="text-sm text-gray-300">Administra los servicios ofrecidos</p>
+                            </div>
+                            <button @onclick="CloseViewServiceModal"
+                                    class="p-2 rounded-full hover:bg-gray-700 transition-colors text-gray-300 hover:text-white">
+                                <i class="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+
+                        <!-- Contenido -->
+                        <div class="flex-1 overflow-y-auto">
+                            @if (isLoading)
+                            {
+                                <div class="flex flex-col items-center justify-center p-12">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary mb-4"></div>
+                                    <p class="text-gray-400">Cargando servicios...</p>
+                                </div>
+                            }
+                            else if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="flex flex-col items-center justify-center p-12 text-center">
+                                    <div class="w-20 h-20 bg-red-900/20 rounded-full flex items-center justify-center mb-5 mx-auto">
+                                        <i class="fas fa-exclamation-triangle text-2xl text-red-400"></i>
+                                    </div>
+                                    <h4 class="text-lg font-medium text-white mb-2">Error al cargar servicios</h4>
+                                    <p class="text-red-400 max-w-md mx-auto mb-6">
+                                        @if (errorMessage.Contains("JSON value"))
+                                        {
+                                            <span>Error en el formato de los datos. Por favor, inténtalo de nuevo.</span>
+                                        }
+                                        else
+                                        {
+                                            @errorMessage
+                                        }
+                                    </p>
+                                </div>
+                            }
+                            else if (currentServices.Any())
+                            {
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+                                    @foreach (var service in currentServices)
+                                    {
+                                        <div class="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700 hover:border-secondary/50 transition-all duration-300 shadow-lg">
+                                            <!-- Imagen del servicio -->
+                                            @if (!string.IsNullOrEmpty(service.ImageUrl))
+                                            {
+                                                <div class="h-40 bg-gray-700 overflow-hidden relative">
+                                                    <img src="@service.ImageUrl"
+                                                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                                                         alt="Imagen del servicio @service.Name"/>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="h-40 bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
+                                                    <i class="fas fa-cut text-4xl text-gray-500"></i>
+                                                </div>
+                                            }
+
+                                            <!-- Detalles del servicio -->
+                                            <div class="p-5">
+                                                <div class="flex justify-between items-start mb-3">
+                                                    <h4 class="text-lg font-bold text-white truncate">@service.Name</h4>
+                                                    <span class="bg-secondary/20 text-secondary px-3 py-1 rounded-full text-xs font-semibold">
+                                                @service.DurationInMinutes min
+                                            </span>
+                                                </div>
+
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <span class="text-2xl font-bold text-white">@service.Price.ToString("C")</span>
+                                                    <div class="flex space-x-2">
+                                                        <button @onclick="() => ShowEditServiceModal(service)"
+                                                                class="p-2 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 transition-colors"
+                                                                title="Editar">
+                                                            <i class="fas fa-pencil-alt text-sm"></i>
+                                                        </button>
+                                                        <button @onclick="() => ShowDeleteServiceConfirmation(service)"
+                                                                class="p-2 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 transition-colors"
+                                                                title="Eliminar">
+                                                            <i class="fas fa-trash-alt text-sm"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                @if (!string.IsNullOrEmpty(service.Description))
+                                                {
+                                                    <div class="mt-3 pt-3 border-t border-gray-700">
+                                                        <p class="text-sm text-gray-300 line-clamp-2">@service.Description</p>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex flex-col items-center justify-center p-12 text-center">
+                                    <div class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-5 mx-auto">
+                                        <i class="fas fa-cut text-2xl text-gray-500"></i>
+                                    </div>
+                                    <h4 class="text-lg font-medium text-white mb-2">No hay servicios registrados</h4>
+                                    <p class="text-gray-400 max-w-md mx-auto mb-6">Comienza agregando servicios para que tus clientes puedan reservarlos</p>
+                                    <button @onclick="() => ShowCreateServiceModal(selectedBarbershopForModal)"
+                                            class="px-5 py-2.5 bg-gradient-to-r from-secondary to-purple-600 hover:from-secondary/90 hover:to-purple-600/90 text-white rounded-lg font-medium flex items-center transition-all">
+                                        <i class="fas fa-plus mr-2"></i> Crear primer servicio
+                                    </button>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Footer - Mostrar solo si hay servicios -->
+                        @if (currentServices.Any())
+                        {
+                            <div class="p-4 border-t border-gray-700 bg-gray-900/50 flex justify-end">
+                                <button @onclick="() => ShowCreateServiceModal(selectedBarbershopForModal)"
+                                        class="px-5 py-2.5 bg-gradient-to-r from-secondary to-purple-600 hover:from-secondary/90 hover:to-purple-600/90 text-white rounded-lg text-sm font-medium flex items-center transition-all shadow-lg shadow-secondary/10">
+                                    <i class="fas fa-plus mr-2"></i> Nuevo Servicio
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (showCreateServiceModal)
+        {
+            <div class="fixed inset-0 z-50">
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @onclick="CloseCreateServiceModal"></div>
+                <div class="absolute inset-0 flex items-center justify-center p-4">
+                    <div class="bg-surface rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+                        <!-- Encabezado -->
+                        <div class="p-6 border-b border-gray-700 flex justify-between items-center bg-gradient-to-r from-gray-900 to-gray-800">
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Crear Nuevo Servicio</h3>
+                                <p class="text-sm text-gray-300">Completa los detalles del servicio</p>
+                            </div>
+                            <button @onclick="CloseCreateServiceModal"
+                                    class="p-2 rounded-full hover:bg-gray-700 transition-colors text-gray-300 hover:text-white">
+                                <i class="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+
+                        <!-- Contenido -->
+                        <div class="flex-1 overflow-y-auto p-6">
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start">
+                                    <i class="fas fa-exclamation-circle text-red-400 mt-1 mr-3"></i>
+                                    <div>
+                                        <p class="font-medium text-red-400">Error</p>
+                                        <p class="text-sm text-red-300">@errorMessage</p>
+                                    </div>
+                                </div>
+                            }
+
+                            <EditForm Model="@_createServiceDto" OnValidSubmit="@HandleCreateServiceSubmit">
+                                <DataAnnotationsValidator />
+
+                                <div class="space-y-5">
+                                    <!-- Barbería -->
+                                    <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                                        <label class="block text-xs font-medium text-gray-400 mb-1">BARBERÍA</label>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-store text-gray-400 mr-3"></i>
+                                            <p class="font-medium text-white">@selectedBarbershopForModal?.Name</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Nombre del Servicio -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Nombre del servicio *</label>
+                                        <InputText @bind-Value="_createServiceDto.Name"
+                                                   class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all"
+                                                   placeholder="Ej: Corte de cabello clásico" />
+                                        <ValidationMessage For="@(() => _createServiceDto.Name)" class="text-red-400 text-xs mt-1" />
+                                    </div>
+
+                                    <!-- Precio y Duración -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-300 mb-2">Precio *</label>
+                                            <InputNumber @bind-Value="_createServiceDto.Price"
+                                                         class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all"
+                                                         placeholder="0.00" />
+                                            <ValidationMessage For="@(() => _createServiceDto.Price)" class="text-red-400 text-xs mt-1" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-300 mb-2">Duración (min) *</label>
+                                            <InputNumber @bind-Value="_createServiceDto.DurationInMinutes"
+                                                         class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all"
+                                                         placeholder="30" />
+                                            <ValidationMessage For="@(() => _createServiceDto.DurationInMinutes)" class="text-red-400 text-xs mt-1" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Descripción -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Descripción</label>
+                                        <InputTextArea @bind-Value="_createServiceDto.Description" rows="3"
+                                                       class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-all"
+                                                       placeholder="Describe el servicio en detalle..." />
+                                    </div>
+
+                                    <!-- Imagen del Servicio -->
+                                    <div class="md:col-span-2">
+                                        <h4 class="text-md font-medium mb-3 pb-2 border-b border-gray-700">Imágenes</h4>
+                                        <label class="block text-sm text-gray-400 mb-2">Imagen principal</label>
+                                        <div class="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                                                <p class="text-sm text-gray-400 mb-2">Arrastra una imagen o haz clic para seleccionar</p>
+                                                <InputFile OnChange="@HandleServiceImageUpload" accept="image/*"
+                                                           class="block w-full text-sm text-gray-400
+                                         file:mr-4 file:py-2 file:px-4
+                                         file:rounded-md file:border-0
+                                         file:text-sm file:font-semibold
+                                         file:bg-primary file:text-white
+                                         hover:file:bg-primary/90"/>
+                                                @if (serviceImagePreviewUrl != null)
+                                                {
+                                                    <div class="mt-4">
+                                                        <img src="@serviceImagePreviewUrl" class="max-h-40 rounded-md" alt="Vista previa de la imagen"/>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Footer con botones -->
+                                <div class="mt-8 pt-5 border-t border-gray-700 flex justify-end space-x-3">
+                                    <button type="button" @onclick="CloseCreateServiceModal"
+                                            class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-all">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" disabled="@isLoading"
+                                            class="px-5 py-2.5 bg-gradient-to-r from-secondary to-purple-600 hover:from-secondary/90 hover:to-purple-600/90 text-white rounded-lg font-medium flex items-center transition-all shadow-lg shadow-secondary/10">
+                                        @if (isLoading)
+                                        {
+                                            <span class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></span>
+                                            <span>Guardando...</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-save mr-2"></i>
+                                            <span>Guardar Servicio</span>
+                                        }
+                                    </button>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        
+        
+        <!-- Modal para EDITAR horario -->
+        @if (showEditScheduleModal && currentSchedule != null)
+        {
+            <div class="fixed inset-0 z-50">
+                <div class="absolute inset-0 bg-black bg-opacity-50" @onclick="CloseEditModal"></div>
+                <div class="absolute inset-0 flex items-center justify-center p-4">
+                    <div class="bg-surface rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Editar Horario</h3>
+                                <button @onclick="CloseEditModal" class="text-gray-400 hover:text-white">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="mb-4 p-3 bg-red-500/10 text-red-500 rounded-md flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-2"></i>
+                                    @errorMessage
+                                </div>
+                            }
+
+                            <EditForm Model="@_updateSchedulesDTos" OnValidSubmit="@HandleEditSubmit">
+                                <DataAnnotationsValidator />
+
+                                <div class="space-y-4 mb-6">
+                                    <div>
+                                        <label class="block text-sm text-gray-400 mb-1">Barbería</label>
+                                        <div class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm flex items-center">
+                                            <i class="fas fa-store mr-2 text-gray-400"></i>
+                                            @selectedBarbershopForModal?.Name
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm text-gray-400 mb-1">Días de la semana *</label>
+                                        <InputSelect @bind-Value="_updateSchedulesDTos.days" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <option value="">-- Selecciona un valor --</option>
+                                            @foreach (var day in Enum.GetValues(typeof(Weekday)))
+                                            {
+                                                <option value="@day.ToString()">@day.ToString()</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => _updateSchedulesDTos.days)" />
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm text-gray-400 mb-1">Dia festivo *</label>
+                                        <InputSelect @bind-Value="_updateSchedulesDTos.IsHoliday" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <option value="">-- Selecciona un valor --</option>
+                                            @foreach (var day in Enum.GetValues(typeof(Status)))
+                                            {
+                                                <option value="@day.ToString()">@day.ToString()</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => _updateSchedulesDTos.IsHoliday)" />
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm text-gray-400 mb-1">Hora de apertura *</label>
+                                            <input type="time" @bind="_updateSchedulesDTos.OpeningTime" 
+                                                   class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                                            <ValidationMessage For="@(() => _updateSchedulesDTos.OpeningTime)" />
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm text-gray-400 mb-1">Hora de cierre *</label>
+                                            <input type="time" @bind="_updateSchedulesDTos.ClosingTime" 
+                                                   class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                                            <ValidationMessage For="@(() => _updateSchedulesDTos.ClosingTime)" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm text-gray-400 mb-1">Notas</label>
+                                        <InputTextArea @bind-Value="_updateSchedulesDTos.Notes" rows="3"
+                                                       class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                                       placeholder="Ej: Horario especial los viernes, descanso entre 13:00-14:00, etc." />
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" @onclick="CloseEditModal"
+                                            class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-sm transition-colors">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" disabled="@isLoading"
+                                            class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-md text-sm flex items-center transition-colors">
+                                        @if (isLoading)
+                                        {
+                                            <span class="loading loading-spinner loading-xs mr-2"></span>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-save mr-2"></i>
+                                        }
+                                        Guardar Cambios
+                                    </button>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Modal para confirmar eliminación -->
+        @if (showDeleteModal)
+        {
+            <div class="fixed inset-0 z-50">
+                <div class="absolute inset-0 bg-black bg-opacity-50" @onclick="CloseDeleteModal"></div>
+                <div class="absolute inset-0 flex items-center justify-center p-4">
+                    <div class="bg-surface rounded-lg shadow-lg w-full max-w-md">
+                        <div class="p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-red-500/10 p-2 rounded-full mr-3">
+                                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-red-400">Confirmar Eliminación</h3>
+                            </div>
+
+                            <p class="mb-4">¿Estás seguro de que deseas eliminar este horario?s</p>
+                            <p class="text-sm text-gray-400 mb-4">Esta acción no se puede deshacer.</p>
+
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="mb-4 p-3 bg-red-500/10 text-red-500 rounded-md flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-2"></i>
+                                    @errorMessage
+                                </div>
+                            }
+
+                            <div class="flex justify-end space-x-3">
+                                <button @onclick="CloseDeleteModal"
+                                        class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-sm transition-colors">
+                                    Cancelar
+                                </button>
+                                <button @onclick="ConfirmDelete"
+                                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm flex items-center transition-colors">
+                                    @if (isLoading)
+                                    {
+                                        <span class="loading loading-spinner loading-xs mr-2"></span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-trash-alt mr-2"></i>
+                                    }
+                                    Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    // Variables comunes
+    private List<RegisteredCompaniesDTO> barbershops = new();
+    private bool isLoading = false;
+    private string? errorMessage;
+    private string? successMessage;
+    private RegisteredCompaniesDTO? selectedBarbershopForModal;
+    private bool isUploadingImage = false;
+
+
+    // Variables para horarios
+    private bool showViewScheduleModal = false;
+    private bool showCreateScheduleModal = false;
+    private bool showEditScheduleModal = false;
+    private bool showDeleteModal = false;
+    private List<ScheduleDTO> currentSchedules = new();
+    private ScheduleDTO? currentSchedule = null;
+    private CreateScheduleDTO _createScheduleDto = new();
+    private UpdateSchedulesDTos _updateSchedulesDTos = new();
+
+    // Variables para servicios
+    private bool showViewServiceModal = false;
+    private bool showCreateServiceModal = false;
+    private bool showEditServiceModal = false;
+    private bool showDeleteServiceModal = false;
+    private List<ServicesDTos> currentServices = new();
+    private ServicesDTos? currentService = null;
+
+    private CreateServiceDto _createServiceDto = new();
+
+    // private UpdateServiceDto _updateServiceDto = new();
+    private string? serviceImagePreviewUrl;
+    private IBrowserFile? serviceImageFile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBarbershops();
+    }
+
+    private async Task LoadBarbershops()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var registeredCompanyId = await LocalStorage.GetItemAsync<string>("CompanyId");
+
+            if (!string.IsNullOrEmpty(registeredCompanyId))
+            {
+                var companies = await RegisteredCompanyService.GetRegisteredCompaniesById(new List<string> { registeredCompanyId });
+
+                if (companies?.Any() == true)
+                {
+                    var company = companies.First();
+                    barbershops.Add(new RegisteredCompaniesDTO
+                    {
+                        RegisteredCompaniesId = company.RegisteredCompaniesId,
+                        Name = company.Name,
+                        PhoneNumber = company.PhoneNumber,
+                        AddresCompanies = company.AddresCompanies,
+                        LogoUrl = company.LogoUrl,
+                        Status = company.Status
+                    });
+                }
+                else
+                {
+                    errorMessage = "No se encontraron barberías registradas";
+                }
+            }
+            else
+            {
+                errorMessage = "No se pudo identificar la barbería actual";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error al cargar las barberías: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    #region Horarios Methods
+
+    private async Task ShowViewScheduleModal(RegisteredCompaniesDTO barbershop)
+    {
+        selectedBarbershopForModal = barbershop;
+        isLoading = true;
+        showViewScheduleModal = true;
+        errorMessage = null;
+
+        try
+        {
+            var result = await ScheduleService.GetSchedulesByCompany(barbershop.RegisteredCompaniesId);
+
+            if (result.Success && result.Data != null)
+            {
+                currentSchedules = result.Data.OrderBy(s => s.days).ToList();
+                successMessage = null;
+            }
+            else
+            {
+                errorMessage = result.Error ?? "No se encontraron horarios para esta barbería";
+                currentSchedules = new List<ScheduleDTO>();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error al cargar los horarios: {ex.Message}";
+            currentSchedules = new List<ScheduleDTO>();
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ShowCreateScheduleModal(RegisteredCompaniesDTO barbershop)
+    {
+        selectedBarbershopForModal = barbershop;
+        _createScheduleDto = new CreateScheduleDTO
+        {
+            RegisteredCompanyId = barbershop.RegisteredCompaniesId,
+        };
+        errorMessage = null;
+        showCreateScheduleModal = true;
+    }
+
+    private void ShowEditScheduleModal(ScheduleDTO schedule)
+    {
+        currentSchedule = schedule;
+        _updateSchedulesDTos = new UpdateSchedulesDTos
+        {
+            days = schedule.days,
+            OpeningTime = schedule.OpeningTime,
+            ClosingTime = schedule.ClosingTime,
+            Notes = schedule.Notes,
+            IsHoliday = schedule.IsHoliday
+        };
+        errorMessage = null;
+        showEditScheduleModal = true;
+    }
+
+    private void CloseViewModal()
+    {
+        showViewScheduleModal = false;
+        currentSchedules = new List<ScheduleDTO>();
+        errorMessage = null;
+        StateHasChanged();
+    }
+
+    private void CloseCreateModal()
+    {
+        showCreateScheduleModal = false;
+        _createScheduleDto = new CreateScheduleDTO();
+        errorMessage = null;
+    }
+
+    private void CloseEditModal()
+    {
+        showEditScheduleModal = false;
+        currentSchedule = null;
+        errorMessage = null;
+    }
+
+    private void CloseDeleteModal()
+    {
+        showDeleteModal = false;
+        currentSchedule = null;
+        errorMessage = null;
+    }
+
+    private void ShowDeleteConfirmation(ScheduleDTO schedule)
+    {
+        currentSchedule = schedule;
+        showDeleteModal = true;
+    }
+
+    private async Task HandleCreateSubmit()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        if (selectedBarbershopForModal == null) return;
+
+        var result = await ScheduleService.CreateSchedule(_createScheduleDto);
+
+        if (result.Success && result.Data != null)
+        {
+            successMessage = "Horario creado correctamente";
+            showCreateScheduleModal = false;
+
+            if (selectedBarbershopForModal != null)
+            {
+                await ShowViewScheduleModal(selectedBarbershopForModal);
+            }
+        }
+        else
+        {
+            if (result.ValidationMessages != null && result.ValidationMessages.Any())
+            {
+                errorMessage = "Por favor, verifica los siguientes errores de validación:";
+                foreach (var validationError in result.ValidationMessages)
+                {
+                    errorMessage += $"\n{validationError.propertyName}: {string.Join(", ", validationError.errorMessage)}";
+                }
+            }
+            else
+            {
+                errorMessage = result.Error ?? "Error al crear el horario. Verifica los datos e intenta nuevamente.";
+            }
+        }
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleEditSubmit()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        if (currentSchedule == null) return;
+
+        var result = await ScheduleService.UpdateScheduleById(currentSchedule.schedulesId, _updateSchedulesDTos);
+
+        if (result.Success && result.Data != null)
+        {
+            successMessage = "Horario actualizado correctamente";
+            showEditScheduleModal = false;
+
+            if (selectedBarbershopForModal != null)
+            {
+                await ShowViewScheduleModal(selectedBarbershopForModal);
+            }
+        }
+        else
+        {
+            if (result.ValidationMessages != null && result.ValidationMessages.Any())
+            {
+                errorMessage = "Por favor, verifica los siguientes errores de validación:";
+                foreach (var validationError in result.ValidationMessages)
+                {
+                    errorMessage += $"\n{validationError.propertyName}: {string.Join(", ", validationError.errorMessage)}";
+                }
+            }
+            else
+            {
+                errorMessage = result.Error ?? "Error al actualizar el horario. Verifica los datos e intenta nuevamente.";
+            }
+        }
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (currentSchedule == null) return;
+
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var deletedId = await ScheduleService.DeleteScheduleById(currentSchedule.schedulesId);
+
+            if (deletedId != null)
+            {
+                successMessage = "Horario eliminado correctamente";
+
+                currentSchedules = currentSchedules
+                    .Where(s => s.schedulesId != currentSchedule.schedulesId)
+                    .ToList();
+
+                showDeleteModal = false;
+
+                if (selectedBarbershopForModal != null)
+                {
+                    await ShowViewScheduleModal(selectedBarbershopForModal);
+                }
+            }
+            else
+            {
+                errorMessage = "No se pudo eliminar el horario. El ID devuelto es inválido.";
+            }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            errorMessage = "Problema de conexión con el servidor. Verifique su conexión a Internet.";
+            Console.Error.WriteLine($"HTTP Error: {httpEx.Message}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error inesperado al eliminar el horario: {ex.Message}";
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    #endregion
+
+    #region Servicios Methods
+
+    private async Task ShowViewServiceModal(RegisteredCompaniesDTO barbershop)
+    {
+        selectedBarbershopForModal = barbershop;
+        isLoading = true;
+        showViewServiceModal = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = await Services.GetServicesByCompanyId(barbershop.RegisteredCompaniesId);
+
+            if (result.Success && result.Data != null)
+            {
+                currentServices = result.Data.OrderBy(s => s.Name).ToList();
+                successMessage = null;
+            }
+            else
+            {
+                errorMessage = result.Error ?? "No se encontraron servicios";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error al cargar servicios: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ShowCreateServiceModal(RegisteredCompaniesDTO barbershop)
+    {
+        selectedBarbershopForModal = barbershop;
+        _createServiceDto = new CreateServiceDto
+        {
+            RegisteredCompanyId = barbershop.RegisteredCompaniesId,
+        };
+        serviceImagePreviewUrl = null;
+        serviceImageFile = null;
+        errorMessage = null;
+        showCreateServiceModal = true;
+    }
+
+    private void ShowEditServiceModal(ServicesDTos service)
+    {
+        // currentService = service;
+        // _updateServiceDto = new UpdateServiceDto
+        // {
+        //     Name = service.Name,
+        //     Price = service.Price,
+        //     DurationInMinutes = service.DurationInMinutes,
+        //     Description = service.Description
+        // };
+        // serviceImagePreviewUrl = null;
+        // serviceImageFile = null;
+        // errorMessage = null;
+        // showEditServiceModal = true;
+    }
+
+    private void CloseViewServiceModal()
+    {
+        showViewServiceModal = false;
+        currentServices = new List<ServicesDTos>();
+        errorMessage = null;
+        StateHasChanged();
+    }
+
+    private void CloseCreateServiceModal()
+    {
+        showCreateServiceModal = false;
+        _createServiceDto = new CreateServiceDto();
+        serviceImagePreviewUrl = null;
+        serviceImageFile = null;
+        errorMessage = null;
+    }
+
+    private void CloseEditServiceModal()
+    {
+        showEditServiceModal = false;
+        currentService = null;
+        serviceImagePreviewUrl = null;
+        serviceImageFile = null;
+        errorMessage = null;
+    }
+
+    private void CloseDeleteServiceModal()
+    {
+        showDeleteServiceModal = false;
+        currentService = null;
+        errorMessage = null;
+    }
+
+    private void ShowDeleteServiceConfirmation(ServicesDTos service)
+    {
+        currentService = service;
+        showDeleteServiceModal = true;
+    }
+
+    private async Task HandleCreateServiceSubmit()
+    {
+        isLoading = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            if (serviceImageFile != null)
+            {
+                _createServiceDto.ImageFile = serviceImageFile;
+            }
+
+            var result = await Services.CreateService(_createServiceDto);
+
+            if (result.Success && result.Data != null)
+            {
+                successMessage = "Servicio creado correctamente";
+                showCreateServiceModal = false;
+
+                if (selectedBarbershopForModal != null)
+                {
+                    await ShowViewServiceModal(selectedBarbershopForModal);
+                }
+            }
+            else
+            {
+                errorMessage = result.Error ?? "Error al crear el servicio";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error inesperado: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleEditServiceSubmit()
+    {
+        // isLoading = true;
+        // errorMessage = null;
+        //
+        // if (currentService == null) return;
+        //
+        // try
+        // {
+        //     // Asignar la imagen si se cargó una nueva
+        //     if (serviceImageFile != null)
+        //     {
+        //         _updateServiceDto.ImageFile = serviceImageFile;
+        //     }
+        //
+        //     var result = await ServicesService.UpdateServiceById(currentService.ServicesId, _updateServiceDto);
+        //
+        //     if (result.Success && result.Data != null)
+        //     {
+        //         successMessage = "Servicio actualizado correctamente";
+        //         showEditServiceModal = false;
+        //     
+        //         if (selectedBarbershopForModal != null)
+        //         {
+        //             await ShowViewServiceModal(selectedBarbershopForModal);
+        //         }
+        //     }
+        //     else
+        //     {
+        //         if (result.ValidationMessages != null && result.ValidationMessages.Any())
+        //         {
+        //             errorMessage = "Por favor, verifica los siguientes errores de validación:";
+        //             foreach (var validationError in result.ValidationMessages)
+        //             {
+        //                 errorMessage += $"\n{validationError.propertyName}: {string.Join(", ", validationError.errorMessage)}";
+        //             }
+        //         }
+        //         else
+        //         {
+        //             errorMessage = result.Error ?? "Error al actualizar el servicio. Verifica los datos e intenta nuevamente.";
+        //         }
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
+        //     errorMessage = $"Error inesperado al actualizar el servicio: {ex.Message}";
+        // }
+        // finally
+        // {
+        //     isLoading = false;
+        //     StateHasChanged();
+        // }
+    }
+
+    private async Task ConfirmServiceDelete()
+    {
+        // if (currentService == null) return;
+        //
+        // isLoading = true;
+        // errorMessage = null;
+        //
+        // try
+        // {
+        //     var deletedId = await ServicesService.DeleteServiceById(currentService.ServicesId);
+        //
+        //     if (deletedId != null)
+        //     {
+        //         successMessage = "Servicio eliminado correctamente";
+        //     
+        //         currentServices = currentServices
+        //             .Where(s => s.ServicesId != currentService.ServicesId)
+        //             .ToList();
+        //     
+        //         showDeleteServiceModal = false;
+        //     
+        //         if (selectedBarbershopForModal != null)
+        //         {
+        //             await ShowViewServiceModal(selectedBarbershopForModal);
+        //         }
+        //     }
+        //     else
+        //     {
+        //         errorMessage = "No se pudo eliminar el servicio. El ID devuelto es inválido.";
+        //     }
+        // }
+        // catch (HttpRequestException httpEx)
+        // {
+        //     errorMessage = "Problema de conexión con el servidor. Verifique su conexión a Internet.";
+        //     Console.Error.WriteLine($"HTTP Error: {httpEx.Message}");
+        // }
+        // catch (Exception ex)
+        // {
+        //     errorMessage = $"Error inesperado al eliminar el servicio: {ex.Message}";
+        //     Console.Error.WriteLine($"Error: {ex.Message}");
+        // }
+        // finally
+        // {
+        //     isLoading = false;
+        //     StateHasChanged();
+        // }
+    }
+
+    private async Task HandleServiceImageUpload(InputFileChangeEventArgs e)
+    {
+        isUploadingImage = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            const long maxFileSize = 5 * 1024 * 1024; // 5MB
+            var file = e.File;
+
+            if (file == null)
+            {
+                errorMessage = "No se seleccionó ninguna imagen.";
+                return;
+            }
+
+            if (!file.ContentType.StartsWith("image/"))
+            {
+                errorMessage = "El archivo debe ser una imagen.";
+                return;
+            }
+
+            if (file.Size > maxFileSize)
+            {
+                errorMessage = "La imagen es demasiado grande (máximo 5MB)";
+                return;
+            }
+
+            var resizedImage = await file.RequestImageFileAsync("image/png", 800, 800);
+            var buffer = new byte[resizedImage.Size];
+            await resizedImage.OpenReadStream(maxFileSize).ReadAsync(buffer);
+            serviceImagePreviewUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+            serviceImageFile = file;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error al cargar la imagen: {ex.Message}";
+        }
+        finally
+        {
+            isUploadingImage = false;
+            StateHasChanged();
+        }
+    }
+
+
+    private void RemoveServiceImage()
+    {
+        serviceImageFile = null;
+        serviceImagePreviewUrl = null;
+    }
+
+    private async Task Logout()
+    {
+
+    }
+
+    #endregion
+
+}
+}

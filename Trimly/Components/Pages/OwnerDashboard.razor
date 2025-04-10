@@ -1,13 +1,13 @@
 @page "/owner-dashboard"
-@using Microsoft.AspNetCore.Authorization
 @attribute [Authorize(Roles = nameof(Roles.Owner))]
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
-@inject ILocalStorageService LocalStorage
+@inject IJSRuntime JSRuntime
+
 
 <body class="min-h-screen bg-background text-text">
 <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
+    <!-- Sidebar Original (Sin cambios) -->
     <aside class="hidden md:flex md:flex-col w-64 bg-surface border-r border-gray-700">
         <div class="p-4 border-b border-gray-700">
             <a href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -25,37 +25,36 @@
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink href="/owner-companies" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                    <NavLink href="/owner/companies" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                         <i class="fas fa-store w-5 h-5 mr-3"></i>
                         Mis Barberías
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink href="/owner-barberos" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                    <NavLink href="/owner/barberos" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                         <i class="fas fa-cut w-5 h-5 mr-3"></i>
                         Barberos
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink href="/owner-servicios" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                        <i class="fas fa-list-alt w-5 h-5 mr-3"></i>
-                        Servicios
+                    <NavLink href="/owner/schedule" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                        <i class="fas fa-clock w-5 h-5 mr-3"></i>
+                        Horarios
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink href="/owner-appointments" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                    <NavLink href="/owner/appointments" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                         <i class="fas fa-calendar-alt w-5 h-5 mr-3"></i>
                         Citas
                     </NavLink>
                 </li>
 
                 <li>
-                    <NavLink href="/owner-reviews" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                    <NavLink href="/owner/reviews" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                         <i class="fas fa-star w-5 h-5 mr-3"></i>
                         Reseñas
                     </NavLink>
                 </li>
-
             </ul>
 
             <div class="mt-8 px-4">
@@ -64,13 +63,13 @@
                 </h3>
                 <ul class="mt-2 space-y-1">
                     <li>
-                        <NavLink href="/owner-perfil" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                        <NavLink href="/owner/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                             <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
                             Mi Perfil
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink href="/owner-ajustes" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+                        <NavLink href="/owner/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
                             <i class="fas fa-cog w-5 h-5 mr-3"></i>
                             Ajustes
                         </NavLink>
@@ -80,230 +79,234 @@
         </nav>
 
         <!-- User -->
-        <div class="p-4 border-t border-gray-700">
-            <div class="flex items-center">
-                <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
-                <div>
-                    <p class="text-sm font-medium">Juan Pérez</p>
-                    <p class="text-xs text-gray-400">Propietario</p>
+        <div class="px-4 py-3 border-t border-gray-800/50 bg-gradient-to-r from-gray-900/50 to-gray-800/20">
+            <div class="flex items-center justify-between">
+                <div class="relative">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_12px_-2px_rgba(99,102,241,0.5)] group-hover:shadow-[0_0_16px_-1px_rgba(99,102,241,0.7)] transition-all duration-500">
+                        <i class="fas fa-user-astronaut text-sm text-white/90"></i>
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 border-2 border-gray-900 animate-pulse"></div>
                 </div>
-                <button @onclick="Logout" id="logout-sidebar-button" class="ml-auto text-gray-400 hover:text-white">
-                    <i class="fas fa-sign-out-alt"></i>
+
+                <div class="flex-1 px-3 overflow-hidden">
+                    <p class="text-sm font-medium tracking-wide text-gray-100 truncate">
+                        Mi Cuenta
+                    </p>
+                    <p class="text-xs text-purple-300/80 font-medium truncate">
+                        Propietario
+                    </p>
+                </div>
+
+                <button @onclick="Logout"
+                        class="p-2 rounded-full group transition-all duration-300 hover:bg-purple-900/20"
+                        title="Cerrar sesión">
+                    <div class="relative">
+                        <i class="fas fa-arrow-right-from-bracket text-gray-400 group-hover:text-purple-300 group-hover:scale-110 transition-all duration-300"></i>
+                        <div class="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_12px_3px_rgba(196,181,253,0.4)] transition-all duration-500"></div>
+                    </div>
                 </button>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
+    <!-- Main Content Minimalista -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Top Header -->
-        <header class="bg-surface/80 backdrop-blur-md shadow-md z-10">
-            <div class="px-4 py-4 flex justify-between items-center">
-                <div>
-                    <h1 class="text-xl font-semibold">Bienvenido {}</h1>
-                    <p class="text-sm text-gray-400">Gestiona como quieras</p>
-                </div>
-
-                <div class="flex items-center space-x-4">
-
-                </div>
+        <!-- Top Header Simplificado -->
+        <header class="bg-surface/80 backdrop-blur-md border-b border-white/5">
+            <div class="px-6 py-4">
+                <h1 class="text-xl font-semibold">Resumen</h1>
             </div>
         </header>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto bg-background p-4">
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-surface rounded-lg shadow-md p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-primary/10 text-primary mr-4">
-                            <i class="fas fa-store text-xl"></i>
+        <!-- Contenido Principal Minimalista -->
+        <main class="flex-1 overflow-y-auto bg-background p-6">
+            <!-- Acciones Principales -->
+            <div class="mb-8">
+                <h2 class="text-lg font-semibold mb-4">Acciones rápidas</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <NavLink href="/owner/companies" class="bg-surface border border-white/5 rounded-xl p-5 hover:border-primary/30 transition-colors">
+                        <div class="flex items-center">
+                            <div class="bg-primary/10 text-primary p-2 rounded-lg mr-3">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Gestionar Barberías</h3>
+                                <p class="text-sm text-gray-400">Ver y editar tus barberías</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-400">Barberías</p>
-                            <p class="text-2xl font-semibold">14</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-surface rounded-lg shadow-md p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-secondary/10 text-secondary mr-4">
-                            <i class="fas fa-cut text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400">Barberos</p>
-                            <p class="text-2xl font-semibold">14</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-surface rounded-lg shadow-md p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-accent/10 text-accent mr-4">
-                            <i class="fas fa-users text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400">Clientes</p>
-                            <p class="text-2xl font-semibold">120</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-surface rounded-lg shadow-md p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-green-500/10 text-green-500 mr-4">
-                            <i class="fas fa-calendar-check text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400">Citas Totales</p>
-                            <p class="text-2xl font-semibold">50</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="bg-surface rounded-lg shadow-md mb-6">
-                <div class="p-4 border-b border-gray-700">
-                    <h2 class="text-lg font-semibold">Acciones Rápidas</h2>
-                </div>
-                <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <NavLink href="/create-business" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 text-center transition duration-300" Match="NavLinkMatch.Prefix">
-                        <div class="bg-primary/10 text-primary rounded-full p-3 inline-block mb-2">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                        <h3 class="font-medium">Nueva Barbería</h3>
-                        <p class="text-sm text-gray-400 mt-1">Registrar nueva barbería</p>
                     </NavLink>
 
-                    <NavLink href="/owner-businesses" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 text-center transition duration-300" Match="NavLinkMatch.Prefix">
-                        <div class="bg-secondary/10 text-secondary rounded-full p-3 inline-block mb-2">
-                            <i class="fas fa-list"></i>
+                    <NavLink href="/owner/barberos" class="bg-surface border border-white/5 rounded-xl p-5 hover:border-primary/30 transition-colors">
+                        <div class="flex items-center">
+                            <div class="bg-primary/10 text-primary p-2 rounded-lg mr-3">
+                                <i class="fas fa-cut"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Gestionar Barberos</h3>
+                                <p class="text-sm text-gray-400">Administrar tu equipo</p>
+                            </div>
                         </div>
-                        <h3 class="font-medium">Mis Barberías</h3>
-                        <p class="text-sm text-gray-400 mt-1">Listar todas las barberías</p>
                     </NavLink>
 
-                    <NavLink href="/owner-barbers" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 text-center transition duration-300" Match="NavLinkMatch.Prefix">
-                        <div class="bg-accent/10 text-accent rounded-full p-3 inline-block mb-2">
-                            <i class="fas fa-cut"></i>
+                    <NavLink href="/owner/appointments" class="bg-surface border border-white/5 rounded-xl p-5 hover:border-primary/30 transition-colors">
+                        <div class="flex items-center">
+                            <div class="bg-primary/10 text-primary p-2 rounded-lg mr-3">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium">Ver Citas</h3>
+                                <p class="text-sm text-gray-400">Revisar agenda</p>
+                            </div>
                         </div>
-                        <h3 class="font-medium">Gestionar Barberos</h3>
-                        <p class="text-sm text-gray-400 mt-1">Ver y editar barberos</p>
-                    </NavLink>
-
-                    <NavLink href="/owner-appointments" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 text-center transition duration-300" Match="NavLinkMatch.Prefix">
-                        <div class="bg-green-500/10 text-green-500 rounded-full p-3 inline-block mb-2">
-                            <i class="fas fa-calendar-alt"></i>
-                        </div>
-                        <h3 class="font-medium">Gestionar Citas</h3>
-                        <p class="text-sm text-gray-400 mt-1">Ver y administrar citas</p>
                     </NavLink>
                 </div>
             </div>
 
-            <!-- Modules Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Barberías Module -->
-                <div class="bg-surface rounded-lg shadow-md">
-                    <div class="p-4 border-b border-gray-700 flex justify-between items-center">
-                        <h2 class="text-lg font-semibold">Barberías</h2>
-                        <NavLink href="/owner-businesses" class="text-primary hover:text-primary/80 text-sm">Ver todas</NavLink>
-                    </div>
-                    <div class="p-4">
-                        <div class="flex flex-col space-y-4">
-                            <NavLink href="/create-business" class="flex items-center p-2 rounded-md hover:bg-gray-700/50" Match="NavLinkMatch.Prefix">
-                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                                    <i class="fas fa-plus text-primary"></i>
-                                </div>
-                                <span>Crear nueva barbería</span>
-                            </NavLink>
-                            <NavLink href="/owner-businesses" class="flex items-center p-2 rounded-md hover:bg-gray-700/50" Match="NavLinkMatch.Prefix">
-                                <div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center mr-3">
-                                    <i class="fas fa-list text-secondary"></i>
-                                </div>
-                                <span>Ver mis barberías</span>
-                            </NavLink>
-                            <NavLink href="/business/1" class="flex items-center p-2 rounded-md hover:bg-gray-700/50" Match="NavLinkMatch.Prefix">
-                                <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center mr-3">
-                                    <i class="fas fa-info-circle text-accent"></i>
-                                </div>
-                                <span>Ver detalles de barbería</span>
-                            </NavLink>
-                        </div>
-                    </div>
+            <!-- Actividad Reciente Simplificada -->
+            <div class="min-h-[500px] h-[70vh] w-full max-w-[1600px] 2xl:max-w-[1600px] bg-surface border-2 border-primary/30 rounded-xl overflow-hidden relative mx-auto px-4 2xl:px-0">
+                <!-- Fondo de cuadrícula animado -->
+                <div class="absolute inset-0 opacity-30 bg-[size:50px_50px] bg-[linear-gradient(to_right,var(--primary)_1px,transparent_1px),linear-gradient(to_bottom,var(--secondary)_1px,transparent_1px)] animate-bg-move"></div>
+
+                <!-- Partículas de color flotantes -->
+                <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                    <!-- Burbujas de color grandes -->
+                    @for (int i = 0; i < 12; i++)
+                    {
+                        <div class="absolute rounded-full opacity-20 animate-color-bubble"
+                             style="@($"width: {random.Next(40, 100)}px; height: {random.Next(40, 100)}px; background: {GetRandomGradient()}; left: {random.Next(0, 100)}%; top: {random.Next(0, 100)}%; animation-duration: {random.Next(20, 40)}s; animation-delay: {random.Next(0, 10)}s;")"></div>
+                    }
+
+                    <!-- Partículas pequeñas de color -->
+                    @for (int i = 0; i < 60; i++)
+                    {
+                        <div class="absolute w-2 h-2 rounded-full animate-particle-float"
+                             style="@($"background: {GetRandomColor()}; left: {random.Next(0, 100)}%; top: {random.Next(0, 100)}%; animation-duration: {random.Next(10, 25)}s; animation-delay: {random.Next(0, 8)}s; opacity: {random.Next(30, 80)/100};")"></div>
+                    }
+
+                    <!-- Confeti de colores -->
+                    @for (int i = 0; i < 50; i++)
+                    {
+                        <div class="absolute w-1.5 h-1.5 opacity-80 animate-confeti-fall"
+                             style="@($"background: {GetRandomColor()}; left: {random.Next(0, 100)}%; top: -10px; animation-duration: {random.Next(5, 15)}s; animation-delay: {random.Next(0, 5)}s; transform: rotate({random.Next(0, 360)}deg);")"></div>
+                    }
+
+                    <!-- Efectos de energía/aura -->
+                    @for (int i = 0; i < 8; i++)
+                    {
+                        <div class="absolute rounded-full border-2 animate-energy-pulse pointer-events-none"
+                             style="@($"border-color: {GetRandomColor()}; width: {random.Next(100, 300)}px; height: {random.Next(100, 300)}px; left: {random.Next(0, 100)}%; top: {random.Next(0, 100)}%; animation-duration: {random.Next(8, 15)}s; animation-delay: {random.Next(0, 5)}s;")"></div>
+                    }
                 </div>
 
-                <!-- Barberos Module -->
-                <div class="bg-surface rounded-lg shadow-md">
-                    <div class="p-4 border-b border-gray-700 flex justify-between items-center">
-                        <h2 class="text-lg font-semibold">Barberos</h2>
-                        <NavLink href="/owner-barbers" class="text-primary hover:text-primary/80 text-sm">Ver todos</NavLink>
+                <!-- Contenido principal ultra dinámico -->
+                <div class="relative h-full flex flex-col items-center justify-center p-6 z-10 overflow-hidden">
+                    <!-- Logo con efecto energético -->
+                    <div class="mb-4 text-center relative z-20">
+                        <NavLink href="owner-dashboard" class="text-7xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent uppercase tracking-tighter animate-logo-pulse">
+                            Trimly
+                        </NavLink>
+                        <div class="w-64 h-1.5 bg-gradient-to-r from-primary to-secondary mx-auto my-3 animate-width-grow rounded-full"></div>
+                        <p class="text-text font-bold text-lg animate-text-bounce">
+                            ¡Transforma tu look hoy!
+                        </p>
                     </div>
-                    <div class="p-4">
-                        <div class="flex flex-col space-y-4">
-                            <NavLink href="/owner-barbers" class="flex items-center p-2 rounded-md hover:bg-gray-700/50" Match="NavLinkMatch.Prefix">
-                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                                    <i class="fas fa-cut text-primary"></i>
-                                </div>
-                                <span>Ver todos los barberos</span>
-                            </NavLink>
-                            <NavLink href="/add-barber" class="flex items-center p-2 rounded-md hover:bg-gray-700/50" Match="NavLinkMatch.Prefix">
-                                <div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center mr-3">
-                                    <i class="fas fa-user-plus text-secondary"></i>
-                                </div>
-                                <span>Añadir nuevo barbero</span>
-                            </NavLink>
-                            <NavLink href="/barber-schedule" class="flex items-center p-2 rounded-md hover:bg-gray-700/50" Match="NavLinkMatch.Prefix">
-                                <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center mr-3">
-                                    <i class="fas fa-clock text-accent"></i>
-                                </div>
-                                <span>Horarios</span>
-                            </NavLink>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Citas Module -->
-                <div class="bg-surface rounded-lg shadow-md">
-                    <div class="p-4 border-b border-gray-700 flex justify-between items-center">
-                        <h2 class="text-lg font-semibold">Citas</h2>
-                        <NavLink href="/owner-appointments" class="text-primary hover:text-primary/80 text-sm">Ver todas</NavLink>
-                    </div>
-                    <div class="p-4">
-                        <div class="flex flex-col space-y-4">
-                            <NavLink href="/owner-appointments" class="flex items-center p-2 rounded-md hover:bg-gray-700/50" Match="NavLinkMatch.Prefix">
-                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                                    <i class="fas fa-calendar-alt text-primary"></i>
-                                </div>
-                                <span>Ver citas programadas</span>
-                            </NavLink>
-                            <NavLink href="/appointments-calendar" class="flex items-center p-2 rounded-md hover:bg-gray-700/50" Match="NavLinkMatch.Prefix">
-                                <div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center mr-3">
-                                    <i class="fas fa-calendar-day text-secondary"></i>
-                                </div>
-                                <span>Ver calendario</span>
-                            </NavLink>
-                            <NavLink href="/appointments-history" class="flex items-center p-2 rounded-md hover:bg-gray-700/50" Match="NavLinkMatch.Prefix">
-                                <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center mr-3">
-                                    <i class="fas fa-history text-accent"></i>
-                                </div>
-                                <span>Historial de citas</span>
-                            </NavLink>
+                    <!-- Escena super activa con múltiples elementos -->
+                    <div class="relative w-full h-64">
+                        <!-- Avatares de clientes flotantes con halo de color -->
+                        <div class="absolute top-1/4 left-1/5 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary animate-avatar-float">
+                            <div class="absolute inset-0 rounded-full opacity-20 animate-ping-slow" style="animation-delay: 0.5s;"></div>
+                            <div class="absolute inset-2 rounded-full bg-surface"></div>
                         </div>
+
+                        <div class="absolute top-2/3 left-1/3 w-14 h-14 rounded-full bg-gradient-to-br from-secondary to-accent animate-avatar-float-delay">
+                            <div class="absolute inset-0 rounded-full opacity-20 animate-ping-slow" style="animation-delay: 1s;"></div>
+                            <div class="absolute inset-2 rounded-full bg-surface"></div>
+                        </div>
+
+                        <div class="absolute top-1/3 right-1/4 w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary animate-avatar-float-delay-2">
+                            <div class="absolute inset-0 rounded-full opacity-20 animate-ping-slow" style="animation-delay: 1.5s;"></div>
+                            <div class="absolute inset-2 rounded-full bg-surface"></div>
+                        </div>
+
+                        <!-- Tijeras mega animadas con efecto de destello -->
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-scissors-spin">
+                            <div class="relative w-24 h-24">
+                                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary transform origin-left rotate-45 animate-scissor-blade"></div>
+                                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-secondary to-primary transform origin-left -rotate-45 animate-scissor-blade-delay"></div>
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-10 bg-gray-300 rounded-full"></div>
+                                <!-- Efecto de destello -->
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white opacity-0 animate-scissors-flash pointer-events-none"></div>
+                            </div>
+                        </div>
+
+                        <!-- Efectos de pelo cortado con colores -->
+                        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                            @for (int i = 0; i < 60; i++)
+                            {
+                                <div class="absolute w-3 h-3 rounded-full animate-hair-explode"
+                                     style="@($"background: {GetRandomColor()}; left: {random.Next(0, 100)}%; top: {random.Next(0, 100)}%; animation-duration: {random.Next(2, 6)}s; animation-delay: {random.Next(0, 3)}s; opacity: {random.Next(50, 90)/100};")"></div>
+                            }
+                        </div>
+
+                        <!-- Efectos de brillo/estrellas mejorados -->
+                        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                            @for (int i = 0; i < 25; i++)
+                            {
+                                <div class="absolute w-2 h-2 rounded-full animate-star-twinkle"
+                                     style="@($"background: {GetRandomColor()}; left: {random.Next(0, 100)}%; top: {random.Next(0, 100)}%; animation-duration: {random.Next(1, 4)}s; animation-delay: {random.Next(0, 3)}s;")"></div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Llamado a la acción animado con efecto de partículas al hover -->
+                    <div class="relative z-20 mt-6 animate-cta-pulse group">
+                        <NavLink href="owner/companies" class="relative px-8 py-3 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
+                            <span class="relative z-10">¡Administra tu barberia ahora!</span>
+                            <!-- Efecto de partículas al hacer hover -->
+                            <div class="absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                @for (int i = 0; i < 20; i++)
+                                {
+                                    <div class="absolute w-2 h-2 rounded-full animate-button-particle"
+                                         style="@($"background: {GetRandomColor()}; left: 50%; top: 50%; animation-duration: {random.Next(1, 2)}s;")"></div>
+                                }
+                            </div>
+                        </NavLink>
                     </div>
                 </div>
             </div>
+
+
         </main>
     </div>
 </div>
 </body>
-
 @code {
+    private ElementReference containerRef;
+    private IJSObjectReference? module;
+    
+
     private async Task Logout()
     {
         await AuthService.LogoutAsync();
         Navigation.NavigateTo("/login", forceLoad: true);
+    }
+    
+    private Random random = new Random();
+    
+    private string GetRandomColor() {
+        string[] colors = {"var(--primary)", "var(--secondary)", "var(--accent)", "#FFD700", "#FF6347", "#7B68EE", "#00FA9A", "#FF69B4"};
+        return colors[random.Next(colors.Length)];
+    }
+    
+    private string GetRandomGradient() {
+        string[] gradients = {
+            "linear-gradient(to right, var(--primary), var(--secondary))",
+            "linear-gradient(to right, var(--secondary), var(--accent))",
+            "linear-gradient(to right, var(--accent), var(--primary))",
+            "linear-gradient(to right, #FFD700, #FF6347)",
+            "linear-gradient(to right, #7B68EE, #00FA9A)"
+        };
+        return gradients[random.Next(gradients.Length)];
     }
 }
