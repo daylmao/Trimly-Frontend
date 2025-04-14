@@ -58,7 +58,6 @@ public class AppointmentHttpService : IAppointmentHttpService
             {
                 try
                 {
-                    // Intentar deserializar el error (asumiendo que el error viene como JSON)
                     var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawContent);
                     return new ApiResponse<string>
                     {
@@ -75,12 +74,11 @@ public class AppointmentHttpService : IAppointmentHttpService
                     };
                 }
             }
-
-            // La API devuelve un mensaje de éxito como texto plano
+            
             return new ApiResponse<string>
             {
                 Success = true,
-                Data = rawContent.Trim('"') // Eliminar comillas si vienen en la respuesta
+                Data = rawContent.Trim('"') 
             };
         }
         catch (Exception ex)
@@ -93,8 +91,7 @@ public class AppointmentHttpService : IAppointmentHttpService
             };
         }
     }
-
-// Clase para deserializar posibles respuestas de error
+    
     private class ErrorResponse
     {
         public string Message { get; set; }
@@ -115,11 +112,10 @@ public class AppointmentHttpService : IAppointmentHttpService
                 return new ApiResponse<bool>
                 {
                     Success = true,
-                    Data = true // Indica que se canceló correctamente
+                    Data = true 
                 };
             }
-
-            // Manejo de errores más detallado
+            
             try
             {
                 var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(content);
