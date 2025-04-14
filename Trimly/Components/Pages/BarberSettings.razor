@@ -1,4 +1,10 @@
 @page "/barber/settings"
+@using Trimly.Core.Application.DTOs.Account
+@inject IAuthService AuthService
+@inject CustomAuthStateProvider CustomAuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = $"{nameof(Roles.Owner)},{nameof(Roles.Barber)}")]
 
 <body class="min-h-screen bg-background text-text">
 <div class="flex h-screen overflow-hidden">
@@ -151,117 +157,73 @@
         <!-- Main Content Area -->
         <main class="flex-1 overflow-y-auto bg-background p-4">
             <div class="max-w-4xl mx-auto">
-                <!-- Navegación de Ajustes -->
-                <div class="bg-surface rounded-lg shadow-md p-4 mb-6">
+                <!-- Mensaje de estado -->
+                @if (!string.IsNullOrEmpty(_message))
+                {
+                <div class="@(_isSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800") px-4 py-3 rounded mb-4">
+                    @_message
+                </div>
+                }
 
+                <!-- Sección de Cuenta -->
+                <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-lg font-semibold mb-4">Información de Cuenta</h2>
 
-                    <!-- Sección de Cuenta -->
-                    <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
-                        <h2 class="text-lg font-semibold mb-4">Información de Cuenta</h2>
-
-                        <form>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <!-- Información Personal -->
-                                <div class="md:col-span-2">
-                                    <h3 class="text-md font-medium mb-3 pb-2 border-b border-gray-700">Información Personal</h3>
-                                </div>
-
-                                <div>
-                                    <label for="first-name" class="block text-sm text-gray-400 mb-1">Nombre</label>
-                                    <input
-                                        type="text"
-                                        id="first-name"
-                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        value="Miguel"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label for="last-name" class="block text-sm text-gray-400 mb-1">Apellidos</label>
-                                    <input
-                                        type="text"
-                                        id="last-name"
-                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        value="Ángel Gómez"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label for="email" class="block text-sm text-gray-400 mb-1">Email</label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        value="miguel.angel@example.com"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label for="phone" class="block text-sm text-gray-400 mb-1">Teléfono</label>
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        value="+34 623 456 789"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label for="birthdate" class="block text-sm text-gray-400 mb-1">Fecha de nacimiento</label>
-                                    <input
-                                        type="date"
-                                        id="birthdate"
-                                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        value="1985-06-15"
-                                    />
-                                </div>
-                                
+                    <EditForm Model="_updateAccountDto" OnValidSubmit="HandleSubmit">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <!-- Información Personal -->
+                            <div class="md:col-span-2">
+                                <h3 class="text-md font-medium mb-3 pb-2 border-b border-gray-700">Información Personal</h3>
                             </div>
 
-                            <div class="flex justify-end space-x-3">
-                                <button
-                                    type="button"
-                                    class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-sm"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    type="submit"
-                                    class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-md text-sm"
-                                >
-                                    Guardar Cambios
-                                </button>
+                            <div>
+                                <label for="first-name" class="block text-sm text-gray-400 mb-1">Nombre</label>
+                                <InputText
+                                    id="first-name"
+                                    @bind-Value="_updateAccountDto.FirstName"
+                                    class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
-                        </form>
-                    </div>
 
+                            <div>
+                                <label for="last-name" class="block text-sm text-gray-400 mb-1">Apellidos</label>
+                                <InputText
+                                    id="last-name"
+                                    @bind-Value="_updateAccountDto.LastName"
+                                    class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+                            </div>
 
-
-                    <!-- Sección de Eliminación de Cuenta -->
-                    <div class="bg-surface rounded-lg shadow-md p-6">
-                        <h2 class="text-lg font-semibold mb-4">Eliminar Cuenta</h2>
-
-                        <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
-                            <div class="flex items-start">
-                                <i class="fas fa-exclamation-triangle text-red-500 mt-0.5 mr-3"></i>
-                                <div>
-                                    <p class="font-medium text-red-400">Advertencia: Esta acción es irreversible</p>
-                                    <p class="text-sm text-gray-400 mt-1">
-                                        Al eliminar tu cuenta, perderás acceso a todos tus datos, incluyendo historial de citas, reseñas y configuraciones personales. Esta acción no se puede deshacer.
-                                    </p>
-                                </div>
+                            <div>
+                                <label for="username" class="block text-sm text-gray-400 mb-1">Nombre de usuario</label>
+                                <InputText
+                                    id="username"
+                                    @bind-Value="_updateAccountDto.UserName"
+                                    class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
                             </div>
                         </div>
 
-                        <div class="flex items-center">
-                            <button class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-md text-sm">
-                                Eliminar mi cuenta
+                        <div class="flex justify-end space-x-3">
+                            <button
+                                type="button"
+                                onclick="@(() => NavigationManager.NavigateTo("/barber-dashboard"))"
+                                class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-sm"
+                                disabled="@_isLoading">
+                                Cancelar
                             </button>
-                            <p class="text-xs text-gray-400 ml-3">
-                                Debes contactar con el propietario para completar este proceso.
-                            </p>
+                            <button
+                                type="submit"
+                                class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-md text-sm"
+                                disabled="@_isLoading">
+                                @if (_isLoading)
+                                {
+                                <span>Guardando...</span>
+                                }
+                                else
+                                {
+                                <span>Guardar Cambios</span>
+                                }
+                            </button>
                         </div>
-                    </div>
+                    </EditForm>
                 </div>
             </div>
         </main>
@@ -271,8 +233,89 @@
 
 </body>
 
-
-
 @code {
+    private ProfileDTO _profileDto = new();
+    private UpdateAccountDTO _updateAccountDto = new();  
+    private string _message = string.Empty;
+    private bool _isSuccess = false;
+    private bool _isLoading = false;
+    private bool _isDeleting = false;
     
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProfileData();
+    }
+
+    private async Task LoadProfileData()
+    {
+        try
+        {
+            var userId = await LocalStorage.GetItemAsync<string>("userId");
+            var response = await AuthService.GetAccountDetailsAsync(userId);
+        
+            if (response.Success && response.Data != null)
+            {
+                _updateAccountDto = new UpdateAccountDTO
+                {
+                    FirstName = response.Data.FirstName,
+                    LastName = response.Data.LastName,
+                    UserName = response.Data.UserName
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _message = $"✖ Error al cargar perfil: {ex.Message}";
+            _isSuccess = false;
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+    
+    private async Task HandleSubmit()
+    {
+        _isLoading = true;
+        _message = string.Empty;
+        _isSuccess = false;
+        StateHasChanged(); 
+    
+        try
+        {
+            var userId = await LocalStorage.GetItemAsync<string>("userId");
+            var response = await AuthService.UpdateAccountProperties(_updateAccountDto, userId);
+
+            _isSuccess = response.Success;
+            _message = response.Success ? 
+                "✔ Información actualizada correctamente" : 
+                "✖ " + (response.Message ?? "Error al actualizar la información");
+
+            if (response.Success)
+            {
+                // Limpiar el formulario
+                _updateAccountDto = new UpdateAccountDTO();
+                StateHasChanged(); 
+                
+                await Task.Delay(3500);
+                _message = string.Empty;
+            }
+        }
+        catch (Exception ex)
+        {
+            _message = $"✖ Error: {ex.Message}";
+            _isSuccess = false;
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged(); 
+        }
+    }
+    
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        NavigationManager.NavigateTo("/login");
+    }
 }

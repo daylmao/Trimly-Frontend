@@ -310,10 +310,9 @@
 
         if (response.Success)
         {
-            // Crear nueva instancia para forzar actualización
             pagedAppointments = new PagedResponse<AppointmentDTos>
             {
-                Items = new List<AppointmentDTos>(response.Data.Items), // Usar nuevo constructor
+                Items = new List<AppointmentDTos>(response.Data.Items), 
                 TotalCount = response.Data.TotalCount,
                 PageNumber = response.Data.PageNumber,
                 PageSize = response.Data.PageSize
@@ -332,20 +331,19 @@
     {
         isProcessing = true;
         currentProcessingId = appointmentId;
-        StateHasChanged(); // Actualizar UI para mostrar estado de carga
+        StateHasChanged(); 
 
         var response = await _appointmentService.ConfirmAppointmentAsync(appointmentId, serviceId);
         
         if (response.Success)
         {
-            // Actualizar estado local inmediatamente
+
             var appointment = pagedAppointments.Items.FirstOrDefault(a => a.AppointmentId == appointmentId);
             if (appointment != null)
             {
                 appointment.AppointmentStatus = AppointmentStatus.Confirmed;
             }
             
-            // Forzar actualización de la lista
             pagedAppointments.Items = new List<AppointmentDTos>(pagedAppointments.Items);
             StateHasChanged();
         }
@@ -365,21 +363,18 @@ private async Task CancelAppointment(Guid appointmentId)
         isProcessing = true;
         currentProcessingId = appointmentId;
         StateHasChanged();
-
-        // 1. Marcar como cancelado localmente primero
+        
         var appointment = pagedAppointments.Items.FirstOrDefault(a => a.AppointmentId == appointmentId);
         if (appointment != null)
         {
             appointment.AppointmentStatus = AppointmentStatus.Cancelled;
             StateHasChanged();
         }
-
-        // 2. Enviar solicitud al backend
+        
         var response = await _appointmentService.CanceledAppointmentAsync(appointmentId);
 
         if (response?.Success == true)
         {
-            // 3. Eliminar de la lista después de breve retraso
             await Task.Delay(500); // Pequeño retraso para feedback visual
             
             pagedAppointments.Items = pagedAppointments.Items
@@ -387,13 +382,11 @@ private async Task CancelAppointment(Guid appointmentId)
                 .ToList();
                 
             pagedAppointments.TotalCount--;
-            
-            // Forzar actualización
+
             StateHasChanged();
         }
         else if (appointment != null)
         {
-            // Revertir cambios si falla
             appointment.AppointmentStatus = AppointmentStatus.Pending;
             StateHasChanged();
         }
