@@ -1,4 +1,9 @@
 @page "/barber/profile"
+@using Trimly.Core.Application.DTOs.Account
+@inject IAuthService AuthService
+@inject CustomAuthStateProvider CustomAuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
 
 <body class="min-h-screen bg-background text-text">
 <div class="flex h-screen overflow-hidden">
@@ -159,9 +164,12 @@
 
                     <div class="p-6 relative">
                         <div class="flex flex-col md:flex-row md:items-end">
+                            <div class="absolute -top-16 left-6 border-4 border-surface rounded-full">
+                                <img src="https://via.placeholder.com/100" alt="Avatar" class="w-32 h-32 rounded-full">
+                            </div>
 
                             <div class="mt-8 md:ml-32">
-                                <h2 class="text-2xl font-bold">Miguel Ángel</h2>
+                                <h2 class="text-2xl font-bold">@(_profileDto?.FullName ?? "Cargando...")</h2>
                                 <p class="text-gray-400">Barbero</p>
                             </div>
 
@@ -185,31 +193,20 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <h4 class="text-sm text-gray-400 mb-1">Nombre completo</h4>
-                            <p>Miguel Ángel Gómez Sánchez</p>
+                            <p>@(_profileDto?.FullName ?? "Cargando...")</p>
                         </div>
 
                         <div>
                             <h4 class="text-sm text-gray-400 mb-1">Correo electrónico</h4>
-                            <p>miguel.angel@example.com</p>
+                            <p>@(_profileDto?.Email ?? "Cargando...")</p>
                         </div>
 
                         <div>
                             <h4 class="text-sm text-gray-400 mb-1">Teléfono</h4>
-                            <p>+34 623 456 789</p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Fecha de nacimiento</h4>
-                            <p>22 de abril de 1990</p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Dirección</h4>
-                            <p>Calle Alcalá 45, 28001 Madrid</p>
+                            <p>@(_profileDto?.PhoneNumber ?? "No especificado")</p>
                         </div>
                     </div>
                 </div>
-                
 
                 <!-- Información de Cuenta -->
                 <div class="bg-surface rounded-lg shadow-md p-6">
@@ -221,16 +218,13 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <h4 class="text-sm text-gray-400 mb-1">Usuario</h4>
-                            <p>miguelangel</p>
+                            <p>@(_profileDto?.UserName ?? "Cargando...")</p>
                         </div>
 
                         <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Contraseña</h4>
-                            <p>••••••••••</p>
-                            <a href="/barbero-ajustes.html" class="text-primary text-sm hover:text-primary/80">Cambiar contraseña</a>
+                            <h4 class="text-sm text-gray-400 mb-1">Fecha de creación</h4>
+                            <p>@(_profileDto?.CreatedAt?.ToString("dd MMMM yyyy") ?? "No disponible")</p>
                         </div>
-                        
-
                     </div>
                 </div>
             </div>
@@ -242,4 +236,40 @@
 
 @code {
     
+    private ProfileDTO _profileDto;
+    private bool _isLoading = true;
+    private string _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProfileData();
+    }
+
+    private async Task LoadProfileData()
+    {
+        try
+        {
+            var userId = await LocalStorage.GetItemAsync<string>("userId");
+            var response = await AuthService.GetAccountDetailsAsync(userId);
+
+            if (response.Success)
+            {
+                _profileDto = response.Data;
+            }
+            else
+            {
+                _errorMessage = response.ErrorMessage ?? "Error al cargar el perfil";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
 }
