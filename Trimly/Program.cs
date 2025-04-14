@@ -37,6 +37,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRegisteredCompanyService, RegisteredCompanyHttpService>();
 builder.Services.AddScoped<IScheduleService, ScheduleHttpService>();
 builder.Services.AddScoped<IServices, ServicesHttp>();
+builder.Services.AddScoped<IAppointmentHttpService, AppointmentHttpService>();
 builder.Services.Configure<JsonSerializerOptions>(options =>
 {
     options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
