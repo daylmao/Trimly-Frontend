@@ -9,6 +9,7 @@
 @inject IScheduleService ScheduleService
 @inject IServices Services
 @inject ILocalStorageService LocalStorage
+@inject IAuthService AuthService
 
 <div class="min-h-screen bg-background text-text">
     <div class="flex h-screen overflow-hidden">
@@ -958,7 +959,7 @@
 
         try
         {
-            var registeredCompanyId = await LocalStorage.GetItemAsync<string>("CompanyId");
+            var registeredCompanyId = await LocalStorage.GetItemAsync<string>("CurrentCompanyId");
 
             if (!string.IsNullOrEmpty(registeredCompanyId))
             {
@@ -1524,10 +1525,12 @@
 
     private async Task Logout()
     {
-
+        await AuthService.LogoutAsync();
     }
 
     #endregion
+    
 
 }
+
 }

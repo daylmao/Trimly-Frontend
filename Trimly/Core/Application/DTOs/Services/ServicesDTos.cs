@@ -4,7 +4,6 @@ namespace Trimly.Core.Application.DTOs.Services;
 
 public class ServicesDTos
 {
-    
         public Guid? ServiceId { get; set; }
         public string? Name { get; set; }
         public decimal Price { get; set; }
@@ -15,6 +14,4 @@ public class ServicesDTos
         public Guid? RegisteredCompanyId { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdateAt { get; set; }
-    
-
 }

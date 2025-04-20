@@ -144,32 +144,34 @@
 
     <!-- Main Content Area Minimalista -->
     <main class="flex-1 overflow-y-auto bg-background p-6">
-      <div class="max-w-3xl mx-auto">
-        <!-- Profile Header Minimal -->
-        <div class="bg-surface border border-white/5 rounded-xl p-6 mb-6">
-          <div class="flex flex-col md:flex-row md:items-center">
-            <!-- Avatar dinámico con iniciales -->
-            <div class="relative mb-4 md:mb-0 md:mr-6">
-              <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
-                @GetDynamicInitials(_profileDto.FirstName, _profileDto.LastName)
+      <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Columna izquierda - Perfil -->
+        <div class="lg:col-span-1">
+          <div class="bg-surface border border-white/5 rounded-xl p-6 sticky top-6">
+            <!-- Avatar dinámico -->
+            <div class="flex flex-col items-center">
+              <div class="relative mb-4">
+                <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+                  @if (!string.IsNullOrWhiteSpace(_profileDto.FirstName) && !string.IsNullOrWhiteSpace(_profileDto.LastName))
+                  {
+                    <span>@GetDynamicInitials(_profileDto.FirstName, _profileDto.LastName)</span>
+                  }
+                  else
+                  {
+                    <i class="fas fa-user"></i>
+                  }
+
+                </div>
               </div>
-              <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-surface"></div>
-            </div>
 
-            <div class="flex-1">
-              <h2 class="text-2xl font-bold">@_profileDto.FullName</h2>
-              <p class="text-gray-400 mb-4">Propietario</p>
-
-              <NavLink href="/owner/settings" class="inline-flex items-center bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-lg transition-colors">
-                <i class="fas fa-edit mr-2"></i>
-                Editar Perfil
-              </NavLink>
+              <h2 class="text-2xl font-bold text-center">@(_profileDto?.FullName ?? "Cargando...")</h2>
+              <p class="text-primary mb-4">Propietario</p>
             </div>
           </div>
         </div>
 
-        <!-- Secciones de Información -->
-        <div class="space-y-6">
+        <!-- Columna derecha - Información -->
+        <div class="lg:col-span-2 space-y-6">
           <!-- Información Personal -->
           <div class="bg-surface border border-white/5 rounded-xl p-6">
             <div class="flex items-center mb-4">
@@ -182,22 +184,31 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="text-sm text-gray-400">Nombre</label>
-                <p class="font-medium">@_profileDto.FirstName</p>
+                <p class="font-medium">@(_profileDto?.FirstName ?? "Cargando...")</p>
               </div>
 
               <div>
                 <label class="text-sm text-gray-400">Apellido</label>
-                <p class="font-medium">@_profileDto.LastName</p>
+                <p class="font-medium">@(_profileDto?.LastName ?? "Cargando...")</p>
               </div>
 
               <div>
                 <label class="text-sm text-gray-400">Correo electrónico</label>
-                <p class="font-medium">@_profileDto.Email</p>
+                <p class="font-medium">@(_profileDto?.Email ?? "Cargando...")</p>
               </div>
 
               <div>
                 <label class="text-sm text-gray-400">Teléfono</label>
-                <p class="font-medium">@_profileDto.PhoneNumber</p>
+                <p class="font-medium">
+                  @if (!string.IsNullOrEmpty(_profileDto?.PhoneNumber))
+                  {
+                    @_profileDto.PhoneNumber
+                  }
+                  else
+                  {
+                    <span class="text-gray-500">No especificado</span>
+                  }
+                </p>
               </div>
             </div>
           </div>
@@ -211,9 +222,11 @@
               <h3 class="text-lg font-semibold">Información de Cuenta</h3>
             </div>
 
-            <div>
-              <label class="text-sm text-gray-400">Nombre de usuario</label>
-              <p class="font-medium">@_profileDto.UserName</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-gray-400">Nombre de usuario</label>
+                <p class="font-medium">@(_profileDto?.UserName ?? "Cargando...")</p>
+              </div>
             </div>
           </div>
         </div>

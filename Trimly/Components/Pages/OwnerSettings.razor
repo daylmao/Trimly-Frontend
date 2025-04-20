@@ -195,37 +195,7 @@
                             </div>
                         }
                     </div>
-
-                    <!-- Sección de Eliminación de Cuenta -->
-                    <div class="bg-surface border border-white/5 rounded-xl p-6">
-                        <h2 class="text-lg font-semibold mb-4 flex items-center">
-                            <div class="bg-red-500/10 text-red-500 p-2 rounded-lg mr-3">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            Eliminar Cuenta
-                        </h2>
-
-                        <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
-                            <p class="font-medium text-red-400 mb-2">Advertencia: Esta acción es irreversible</p>
-                            <p class="text-sm text-gray-400">
-                                Todos tus datos serán eliminados permanentemente y no podrán ser recuperados.
-                            </p>
-                        </div>
-
-                        <button
-                            @onclick="DeleteAccount"
-                            class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg flex items-center justify-center"
-                            disabled="@_isDeleting"
-                        >
-                            @if (_isDeleting)
-                            {
-                                <span class="animate-spin mr-2">
-                                    <i class="fas fa-circle-notch"></i>
-                                </span>
-                            }
-                            Eliminar mi cuenta
-                        </button>
-                    </div>
+                    
                 </div>
             </main>
         </div>
@@ -247,6 +217,7 @@
     private bool _isSuccess = false;
     private bool _isLoading = false;
     private bool _isDeleting = false;
+    
 
     private async Task HandleSubmit()
     {
@@ -275,10 +246,6 @@
         {
             _isLoading = false;
         }
-    }
-
-    private async Task DeleteAccount()
-    {
     }
     
     private async Task Logout()

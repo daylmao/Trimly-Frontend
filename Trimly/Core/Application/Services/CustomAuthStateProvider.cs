@@ -68,7 +68,8 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
     public async Task ClearAuthDataAsync()
     {
-        await _localStorage.ClearAsync();
+        await _localStorage.RemoveItemAsync("authToken");
+        await _localStorage.RemoveItemAsync("userId");
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
 
     }

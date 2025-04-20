@@ -8,4 +8,5 @@ public interface IRegisteredCompanyService
 {
     Task<ApiResponse<CreateRegisteredCompaniesDTO>> CreateCompany(CreateRegisteredCompaniesDTO company);
     Task<List<RegisteredCompaniesDTO>> GetRegisteredCompaniesById(List<string> companyIds);
+    Task<ApiResponse<RegisteredCompaniesDTO>> GetRegisteredCompanyById(Guid companyIds);
 }
