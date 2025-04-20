@@ -1,4 +1,5 @@
 @page "/barber-dashboard"
+@using Trimly.Core.Application.DTOs.Account
 @using Trimly.Core.Application.DTOs.Appointment
 @using Trimly.Core.Application.Pagination
 @using Trimly.Core.Domain.Enums
@@ -6,6 +7,7 @@
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
 @inject IAppointmentHttpService _appointmentService
+@inject ILocalStorageService LocalStorage
 @attribute [Authorize(Roles = ("Barber"))]
 
 <body class="min-h-screen bg-background text-text">
@@ -51,13 +53,31 @@
 
         <!-- User -->
         <div class="p-4 border-t border-gray-700">
-            <div class="flex items-center">
-                <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
-                <div>
-                    <p class="text-sm font-medium">Miguel Ángel</p>
-                    <p class="text-xs text-gray-400">Barbero</p>
+            <div class="flex items-center justify-between">
+                <div class="relative">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center">
+                        @if (!string.IsNullOrEmpty(_profileDto?.FirstName) || !string.IsNullOrEmpty(_profileDto?.LastName))                        {
+                            <span class="text-white text-sm font-medium">
+                                @GetInitial(_profileDto?.FirstName)@GetInitial(_profileDto?.LastName)
+                            </span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-user text-white/90"></i>
+                        }
+                    </div>
                 </div>
-                <button id="logout-sidebar-button" class="ml-auto text-gray-400 hover:text-white">
+
+                <div class="flex-1 px-3 overflow-hidden">
+                    <p class="text-sm font-medium tracking-wide text-gray-100 truncate">
+                        @(_profileDto?.FullName ?? "Mi Cuenta")
+                    </p>
+                    <p class="text-xs text-gray-400 font-medium truncate">
+                        Barbero
+                    </p>
+                </div>
+
+                <button @onclick="Logout" class="p-2 rounded-full text-gray-400 hover:text-white transition-colors">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -120,13 +140,32 @@
 
             <!-- User -->
             <div class="p-4 border-t border-gray-700">
-                <div class="flex items-center">
-                    <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
-                    <div>
-                        <p class="text-sm font-medium">Miguel Ángel</p>
-                        <p class="text-xs text-gray-400">Barbero</p>
+                <div class="flex items-center justify-between">
+                    <div class="relative">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center">
+                            @if (!string.IsNullOrEmpty(_profileDto?.FirstName) || !string.IsNullOrEmpty(_profileDto?.LastName))
+                            {
+                                <span class="text-white text-sm font-medium">
+                                    @GetInitial(_profileDto?.FirstName)@GetInitial(_profileDto?.LastName)
+                                </span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-user text-white/90"></i>
+                            }
+                        </div>
                     </div>
-                    <button @onclick="Logout" id="logout-mobile-button" class="ml-auto text-gray-400 hover:text-white">
+
+                    <div class="flex-1 px-3 overflow-hidden">
+                        <p class="text-sm font-medium tracking-wide text-gray-100 truncate">
+                            @(_profileDto?.FullName ?? "Mi Cuenta")
+                        </p>
+                        <p class="text-xs text-gray-400 font-medium truncate">
+                            Barbero
+                        </p>
+                    </div>
+
+                    <button @onclick="Logout" class="p-2 rounded-full text-gray-400 hover:text-white transition-colors">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
@@ -141,7 +180,7 @@
             <div class="px-4 py-4 flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-semibold">Dashboard</h1>
-                    <p class="text-sm text-gray-400">Bienvenido, Miguel Ángel</p>
+                    <p class="text-sm text-gray-400">Bienvenido, @(_profileDto?.FirstName ?? "Barbero")</p>
                 </div>
 
                 <div class="flex items-center space-x-4">
@@ -273,9 +312,12 @@
     private bool isProcessing = false;
     private Guid? currentProcessingId = null;
     private System.Threading.Timer refreshTimer;
+    private ProfileDTO _profileDto = new();
+
     
     protected override async Task OnInitializedAsync()
     {
+        await LoadProfileData();
         await LoadAppointments();
         refreshTimer = new System.Threading.Timer(async _ => 
         {
@@ -284,7 +326,42 @@
                 await LoadAppointments();
                 StateHasChanged();
             });
-        }, null, 60000, 60000); // Actualiza cada 60 segundos
+        }, null, 60000, 60000);
+    }
+    
+
+    private async Task LoadProfileData()
+    {
+        try
+        {
+            var userId = await LocalStorage.GetItemAsync<string>("userId");
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var response = await AuthService.GetAccountDetailsAsync(userId);
+            
+                if (response?.Success == true && response.Data != null)
+                {
+                    _profileDto = response.Data;
+                    StateHasChanged(); 
+                }
+                else
+                {
+                    Console.WriteLine("No se pudo cargar el perfil del usuario");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No se encontró userId en localStorage");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading profile: {ex.Message}");
+        }
+    }
+    private string GetInitial(string name)
+    {
+        return !string.IsNullOrEmpty(name) ? name[0].ToString().ToUpper() : "";
     }
     
     public void Dispose()

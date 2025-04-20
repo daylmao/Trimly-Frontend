@@ -4,11 +4,11 @@
 @inject CustomAuthStateProvider CustomAuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
-@attribute [Authorize(Roles = $"{nameof(Roles.Owner)},{nameof(Roles.Barber)}")]
+@attribute [Authorize(Roles = $"{nameof(Roles.Owner)},{"Barber"}")]
 
 <body class="min-h-screen bg-background text-text">
 <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
+    <!-- Sidebar Actualizado -->
     <aside class="hidden md:flex md:flex-col w-64 bg-surface border-r border-gray-700">
         <!-- Logo -->
         <div class="p-4 border-b border-gray-700">
@@ -26,7 +26,6 @@
                         Dashboard
                     </NavLink>
                 </li>
-                
             </ul>
 
             <div class="mt-8 px-4">
@@ -50,92 +49,39 @@
             </div>
         </nav>
 
-        <!-- User -->
-        <div class="p-4 border-t border-gray-700">
-            <div class="flex items-center">
-                <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
-                <div>
-                    <p class="text-sm font-medium">Miguel Ángel</p>
-                    <p class="text-xs text-gray-400">Barbero</p>
+        <!-- User Info Actualizado -->
+        <div class="px-4 py-3 border-t border-gray-800/50">
+            <div class="flex items-center justify-between">
+                <div class="relative">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center">
+                        @if (!string.IsNullOrEmpty(_profileDto?.FirstName) || !string.IsNullOrEmpty(_profileDto?.LastName))
+                        {
+                            <span class="text-white text-sm font-medium">
+                                @GetInitial(_profileDto?.FirstName)@GetInitial(_profileDto?.LastName)
+                            </span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-user text-white/90"></i>
+                        }
+                    </div>
                 </div>
-                <button id="logout-sidebar-button" class="ml-auto text-gray-400 hover:text-white">
-                    <i class="fas fa-sign-out-alt"></i>
+
+                <div class="flex-1 px-3 overflow-hidden">
+                    <p class="text-sm font-medium tracking-wide text-gray-100 truncate">
+                        @(_profileDto?.FullName ?? "Mi Cuenta")
+                    </p>
+                    <p class="text-xs text-gray-400 font-medium truncate">
+                        Barbero
+                    </p>
+                </div>
+
+                <button @onclick="Logout" class="p-2 rounded-full text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-arrow-right-from-bracket"></i>
                 </button>
             </div>
         </div>
     </aside>
-
-    <!-- Mobile sidebar toggle -->
-    <div class="md:hidden fixed bottom-4 right-4 z-50">
-        <button id="mobile-menu-button" class="bg-primary text-white p-3 rounded-full shadow-lg">
-            <i class="fas fa-bars"></i>
-        </button>
-    </div>
-
-    <!-- Mobile sidebar (hidden by default) -->
-    <div id="mobile-sidebar" class="fixed inset-0 z-40 hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-50" id="mobile-sidebar-backdrop"></div>
-        <div class="absolute inset-y-0 left-0 w-64 bg-surface transform transition-transform duration-300 -translate-x-full" id="mobile-sidebar-content">
-            <!-- Mobile sidebar content (same as desktop) -->
-            <!-- Logo -->
-            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
-                <NavLink href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    Trimly
-                </NavLink>
-                <button id="close-mobile-menu" class="text-gray-400 hover:text-white">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <!-- Navigation -->
-            <nav class="flex-1 overflow-y-auto py-4">
-                <ul class="space-y-1 px-2">
-                    <li>
-                        <NavLink href="/barber-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                            <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
-                            Dashboard
-                        </NavLink>
-                    </li>
-
-
-                </ul>
-
-                <div class="mt-8 px-4">
-                    <h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Configuración
-                    </h3>
-                    <ul class="mt-2 space-y-1">
-                        <li>
-                            <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                                <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
-                                Mi Perfil
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
-                                <i class="fas fa-cog w-5 h-5 mr-3"></i>
-                                Ajustes
-                            </NavLink>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- User -->
-            <div class="p-4 border-t border-gray-700">
-                <div class="flex items-center">
-                    <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
-                    <div>
-                        <p class="text-sm font-medium">Miguel Ángel</p>
-                        <p class="text-xs text-gray-400">Barbero</p>
-                    </div>
-                    <button id="logout-mobile-button" class="ml-auto text-gray-400 hover:text-white">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden">
@@ -146,11 +92,6 @@
                     <h1 class="text-xl font-semibold">Ajustes</h1>
                     <p class="text-sm text-gray-400">Configura tu cuenta y preferencias</p>
                 </div>
-
-                <div class="flex items-center space-x-4">
-
-
-                </div>
             </div>
         </header>
 
@@ -160,9 +101,9 @@
                 <!-- Mensaje de estado -->
                 @if (!string.IsNullOrEmpty(_message))
                 {
-                <div class="@(_isSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800") px-4 py-3 rounded mb-4">
-                    @_message
-                </div>
+                    <div class="@(_isSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800") px-4 py-3 rounded mb-4">
+                        @_message
+                    </div>
                 }
 
                 <!-- Sección de Cuenta -->
@@ -215,11 +156,11 @@
                                 disabled="@_isLoading">
                                 @if (_isLoading)
                                 {
-                                <span>Guardando...</span>
+                                    <span>Guardando...</span>
                                 }
                                 else
                                 {
-                                <span>Guardar Cambios</span>
+                                    <span>Guardar Cambios</span>
                                 }
                             </button>
                         </div>
@@ -229,8 +170,6 @@
         </main>
     </div>
 </div>
-
-
 </body>
 
 @code {
@@ -244,6 +183,7 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadProfileData();
+        _updateAccountDto = new();  
     }
 
     private async Task LoadProfileData()
@@ -255,6 +195,7 @@
         
             if (response.Success && response.Data != null)
             {
+                _profileDto = response.Data;
                 _updateAccountDto = new UpdateAccountDTO
                 {
                     FirstName = response.Data.FirstName,
@@ -293,10 +234,8 @@
 
             if (response.Success)
             {
-                // Limpiar el formulario
-                _updateAccountDto = new UpdateAccountDTO();
-                StateHasChanged(); 
-                
+                // Actualizar los datos del perfil
+                await LoadProfileData();
                 await Task.Delay(3500);
                 _message = string.Empty;
             }
@@ -311,6 +250,11 @@
             _isLoading = false;
             StateHasChanged(); 
         }
+    }
+    
+    private string GetInitial(string name)
+    {
+        return !string.IsNullOrEmpty(name) ? name[0].ToString().ToUpper() : "";
     }
     
     private async Task Logout()

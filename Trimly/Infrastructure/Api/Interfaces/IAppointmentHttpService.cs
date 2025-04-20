@@ -10,6 +10,7 @@ public interface IAppointmentHttpService
     Task<ApiResponse<bool>> CanceledAppointmentAsync(Guid appointmentId);
 
     Task<ApiResponse<string>> ConfirmAppointmentAsync(Guid appointmentId, Guid serviceId);
+    Task<ApiResponse<AppointmentResponse>> CreateAppointmentAsync(CreateAppointmentsDTos request);
 
     Task<ApiResponse<PagedResponse<AppointmentDTos>>> PaginationAppointmentsAsync(
         int pageNumber, 
