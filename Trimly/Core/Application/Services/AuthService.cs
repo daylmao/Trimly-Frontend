@@ -106,11 +106,12 @@ public class AuthService : IAuthService
 
         }
         
-        var validationMessages = await response.Content.ReadFromJsonAsync<List<ValidationMessage>>();
+        var validationResponse = await response.Content.ReadFromJsonAsync<ValidationResponse>();
         return new ApiResponse<RegisterResponseDTO>
-        { 
-            Success = false, 
-            ValidationMessages = validationMessages
+        {
+            Success = false,
+            ValidationMessages = validationResponse?.Errors,
+            Error = "Validation failed"
         };
     }
 

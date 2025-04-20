@@ -2,446 +2,266 @@
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
 
 @attribute [Authorize(Roles = nameof(Roles.Client))]
-<body class="bg-background text-text">
-<!-- Encabezado con navegación moderna -->
-<header class="bg-surface/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+
+<body class="bg-background text-text min-h-screen flex flex-col">
+<!-- Encabezado con efecto de vidrio esmerilado mejorado -->
+<header class="bg-surface/90 backdrop-blur-lg shadow-xl sticky top-0 z-50 border-b border-white/5">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center py-4">
+      
+      <!-- Logo con efecto de gradiente animado -->
       <div class="flex items-center">
-        <a href="/user/home" class="flex items-center">
-          <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Trimly</span>
+        <a href="/user/home" class="flex items-center group">
+          <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent group-hover:bg-gradient-to-l transition-all duration-500">Trimly</span>
+          <span class="ml-2 w-2 h-2 rounded-full bg-primary animate-pulse"></span>
         </a>
       </div>
 
-      <!-- Navegación principal - Versión escritorio -->
+      <!-- Main navigation - desktop only con subrayado animado -->
       <nav class="hidden md:flex items-center space-x-1">
-        <a href="/user/home" class="px-3 py-2 rounded-md text-sm font-medium bg-primary/20 text-primary transition duration-300">
-          Inicio
+        <a href="/user/home" class="px-3 py-2 rounded-md text-sm font-medium relative group">
+          <span class="relative z-10 flex items-center">
+            <i class="fas fa-home mr-2 text-primary"></i>
+            Inicio 
+          </span>
+          <span class="absolute bottom-0 left-0 h-0.5 bg-primary w-full transition-all duration-300"></span>
         </a>
-        <a href="explorar.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/10 transition duration-300">
-          Explorar
+        
+        <a href="/explorer" class="px-3 py-2 rounded-md text-sm font-medium relative group">
+          <span class="relative z-10 flex items-center">
+            <i class="fas fa-search mr-2 text-gray-400 group-hover:text-primary transition-colors"></i>
+            Explorar
+          </span>
+          <span class="absolute bottom-0 left-0 h-0.5 bg-primary w-0 group-hover:w-full transition-all duration-300"></span>
         </a>
-            
-        <a href="citas.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/10 transition duration-300">
-          Mis Citas
+        
+        <a href="/appointments" class="px-3 py-2 rounded-md text-sm font-medium relative group">
+          <span class="relative z-10 flex items-center">
+            <i class="fas fa-calendar-alt mr-2 text-gray-400 group-hover:text-primary transition-colors"></i>
+            Mis Citas
+          </span>
+          <span class="absolute bottom-0 left-0 h-0.5 bg-primary w-0 group-hover:w-full transition-all duration-300"></span>
         </a>
       </nav>
 
-      <!-- Búsqueda y perfil -->
+      <!-- Search and profile mejorado -->
       <div class="flex items-center space-x-4">
-        <div class="relative hidden md:block">
-          <input type="text" placeholder="Buscar barberías..." class="w-40 lg:w-64 bg-gray-700/50 border border-gray-600 rounded-full py-1.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
-          <button class="absolute right-0 top-0 mt-1.5 mr-3 text-gray-400">
-            <i class="fas fa-search text-sm"></i>
-          </button>
+    <!-- Profile menu con animación mejorada -->
+    <div class="relative group">
+        <div class="flex items-center space-x-1 p-1 rounded-full hover:bg-gray-700/50 transition-all duration-300 cursor-pointer">
+            <div class="relative">
+                <!-- Aquí está el icono con el fondo que reemplaza la imagen -->
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_12px_-2px_rgba(99,102,241,0.5)] group-hover:shadow-[0_0_16px_-1px_rgba(99,102,241,0.7)] transition-all duration-500">
+                    <i class="fas fa-user-astronaut text-sm text-white/90"></i>
+                </div>
+                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-gray-800"></span>
+            </div>
+            <i class="fas fa-chevron-down text-xs hidden md:block transition-transform duration-300 group-hover:rotate-180"></i>
         </div>
 
-        <!-- Perfil de usuario -->
-        <div class="relative group">
-          <button class="flex items-center space-x-1 p-1 rounded-full hover:bg-gray-700/50 transition duration-300">
-            <img src="https://via.placeholder.com/40" alt="Perfil" class="w-8 h-8 rounded-full border border-gray-600"/>
-            <i class="fas fa-chevron-down text-xs hidden md:block"></i>
-          </button>
-
-          <!-- Menú desplegable -->
-          <div
-            class="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg py-1 hidden group-hover:block" >
-            <NavLink href="perfil-usuario.html" class="block px-4 py-2 text-sm hover:bg-gray-700">Mi Perfil</NavLink>
-            <NavLink href="configuracion.html" class="block px-4 py-2 text-sm hover:bg-gray-700">Configuración</NavLink>
-            <NavLink href="ayuda.html" class="block px-4 py-2 text-sm hover:bg-gray-700">Ayuda</NavLink>
-            <div class="border-t border-gray-700 my-1"></div>
-            <NavLink href="/login" class="block px-4 py-2 text-sm hover:bg-gray-700" @onclick="Logout">Cerrar Sesión</NavLink>
-          </div>
+        <!-- Dropdown menu con sombra y borde mejorados -->
+        <div class="absolute right-0 mt-2 w-48 bg-surface rounded-lg shadow-2xl py-1 z-50 border border-gray-700/30
+            opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right transform scale-95 group-hover:scale-100">
+            <a href="/account/details" class="block px-4 py-2 text-sm hover:bg-gray-700/50 transition-colors duration-300 flex items-center">
+                <i class="fas fa-cog mr-2 text-primary/80"></i>
+                Configuración
+            </a>
+            <div class="border-t border-gray-700/30 my-1"></div>
+            <button @onclick="Logout"
+                    class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700/50 transition-colors duration-300 flex items-center">
+                <i class="fas fa-sign-out-alt mr-2 text-primary/80"></i>
+                Cerrar Sesión
+            </button>
         </div>
-        
-      </div>
     </div>
+</div>
 
+      
+    </div>
   </div>
 </header>
 
-<!-- Hero Section -->
-<section
-  class="relative bg-gradient-to-br from-primary/20 to-background py-12">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="max-w-5xl mx-auto">
-      <div class="flex flex-col md:flex-row items-center justify-between">
-        <div class="mb-8 md:mb-0 md:mr-8">
-          <h1 class="text-4xl font-bold mb-4">Bienvenido, Guirmer</h1>
-          <p class="text-xl text-gray-300 mb-6">
-            ¿Listo para lucir tu mejor estilo?
+<!-- Hero Section más compacta con transición ampliada -->
+<section class="relative bg-gradient-to-br from-primary/20 via-background to-secondary/30 py-16 md:py-32 pb-40 md:pb-48 overflow-hidden gradient-mask flex-grow">
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+    <div class="absolute top-1/4 left-1/5 w-32 h-32 rounded-full bg-primary/15 animate-float-delay-1"></div>
+    <div class="absolute bottom-1/3 right-1/4 w-40 h-40 rounded-full bg-secondary/15 animate-float-delay-2"></div>
+    <div class="absolute top-1/3 right-1/3 w-24 h-24 rounded-full bg-accent/15 animate-float-delay-3"></div>
+    <div class="absolute top-3/4 left-1/3 w-28 h-28 rounded-full bg-primary/10 animate-float-delay-4"></div>
+  </div>
+  
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-10">
+        <!-- Texto principal con más impacto -->
+        <div class="mb-12 md:mb-0 w-full md:w-1/2 space-y-10">
+          <div class="relative">
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight bg-gradient-to-r from-primary via-purple-500 to-secondary bg-clip-text text-transparent">
+              Bienvenido, 
+              <span class="animate-text-pulse block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                @userName
+              </span>
+            </h1>
+            <div class="absolute -bottom-2 left-0 h-1 w-24 bg-gradient-to-r from-primary to-secondary rounded-full animate-grow-width"></div>
+          </div>
+
+          <p class="text-2xl md:text-3xl text-gray-200 mb-10 leading-relaxed relative">
+            ¿Listo para lucir tu mejor 
+            <span class="text-primary font-bold relative">
+              <span class="absolute -bottom-1 left-0 w-full h-1 bg-accent/50 animate-pulse"></span>
+              estilo
+            </span>?
           </p>
-          <div class="flex space-x-4">
-            <a
-              href="citas.html"
-              class="bg-primary hover:bg-purple-700 text-white px-6 py-3 rounded-md transition duration-300 flex items-center">
-              <i class="fas fa-calendar-alt mr-2"></i>
-              Mis Citas
+
+          <!-- Botones mejorados con más espacio debajo -->
+          <div class="flex flex-col sm:flex-row space-y-5 sm:space-y-0 sm:space-x-6 mb-8">
+            <a href="/appointments" class="relative overflow-hidden group bg-gradient-to-br from-primary to-purple-600 text-white px-8 py-4 rounded-2xl transition-all duration-500 shadow-2xl hover:shadow-primary/30 transform hover:scale-[1.03] text-lg font-semibold">
+              <span class="relative z-10 flex items-center justify-center">
+                <i class="fas fa-calendar-alt mr-3 text-xl animate-bounce-slow"></i>
+                Mis Citas
+              </span>
+              <span class="absolute inset-0 bg-gradient-to-r from-primary/40 to-purple-600/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+              <span class="absolute inset-0 border-2 border-primary/30 rounded-2xl group-hover:border-primary/60 transition-all duration-500"></span>
             </a>
-            <a
-              href="explorar.html"
-              class="bg-surface hover:bg-gray-700 text-white px-6 py-3 rounded-md transition duration-300 flex items-center">
-              <i class="fas fa-search mr-2"></i>
-              Explorar
+
+            <a href="/explorer" class="relative overflow-hidden group bg-surface border-2 border-primary/30 text-white px-8 py-4 rounded-2xl transition-all duration-500 shadow-2xl hover:shadow-primary/20 transform hover:scale-[1.03] text-lg font-semibold">
+              <span class="relative z-10 flex items-center justify-center">
+                <i class="fas fa-search mr-3 text-xl animate-pulse-slow"></i>
+                Explorar
+              </span>
+              <span class="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+              <span class="absolute inset-0 border-2 border-transparent group-hover:border-primary/50 rounded-2xl transition-all duration-500"></span>
             </a>
           </div>
         </div>
-        <div class="relative">
-          <div
-            class="absolute -top-4 -left-4 w-24 h-24 bg-primary/20 rounded-full"></div>
-          <div
-            class="absolute -bottom-4 -right-4 w-32 h-32 bg-secondary/20 rounded-full"></div>
-          <img
-            src="https://via.placeholder.com/400x300"
-            alt="Barbería"
-            class="relative z-10 rounded-lg shadow-xl w-full max-w-md"/>
+
+        <!-- Elemento gráfico más impactante -->
+        <div class="relative hidden md:block w-full md:w-1/2">
+          <div class="relative w-80 h-80 mx-auto">
+            <!-- Efecto de aura exterior -->
+            <div class="absolute -inset-4 bg-primary/10 rounded-full animate-pulse-slow blur-xl"></div>
+            
+            <!-- Círculos concéntricos animados -->
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/25 to-secondary/25 rounded-full animate-spin-slow opacity-30"></div>
+            <div class="absolute inset-6 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-full animate-spin-slow-reverse opacity-40"></div>
+            <div class="absolute inset-12 bg-gradient-to-br from-primary/15 to-secondary/15 rounded-full animate-spin-slow opacity-30"></div>
+            
+            <!-- Icono central con efecto 3D -->
+            <div class="relative z-10 w-full h-full flex items-center justify-center">
+              <div class="relative">
+                <i class="fas fa-cut text-8xl text-primary/80 animate-pulse-slow"></i>
+                <div class="absolute inset-0 bg-primary/10 rounded-full -z-10 animate-ping-slow"></div>
+              </div>
+            </div>
+            
+            <!-- Elementos decorativos flotantes -->
+            <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-accent/60 animate-float-delay-1"></div>
+            <div class="absolute bottom-4 left-4 w-4 h-4 rounded-full bg-secondary/60 animate-float-delay-2"></div>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+  
+  <!-- Transición más grande con más espacio -->
+  <div class="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-b from-transparent to-[#1F2937] pointer-events-none z-10"></div>
+
+  <!-- Ondas SVG con animación -->
+  <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-0 wave-container">
+    <svg class="relative w-full h-32 text-[#1F2937] wave-animation" viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="currentColor"></path>
+    </svg>
+  
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none" style="transform: translateY(-2px);">
+      <svg class="relative w-full h-28 text-[#1F2937] wave-animation-delay" viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" fill="currentColor" opacity=".8"></path>
+      </svg>
     </div>
   </div>
 </section>
 
-<!-- Contenido principal -->
-<main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-  <div class="max-w-5xl mx-auto">
-    <!-- Próximas citas -->
-    <div class="bg-surface rounded-lg shadow-md overflow-hidden mb-12">
-      <div class="p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold">Próximas Citas</h2>
-          <a
-            href="citas.html"
-            class="text-primary hover:text-purple-400 transition duration-300 flex items-center">
-            Ver todas
-            <i class="fas fa-chevron-right ml-2 text-sm"></i>
-          </a>
-        </div>
-
-        <!-- Lista de citas -->
-        <div class="space-y-6">
-          <!-- Cita 1 -->
-          <div class="bg-gray-800/50 rounded-lg overflow-hidden">
-            <div class="p-6">
-              <div
-                class="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div class="flex items-start space-x-4">
-                  <div
-                    class="bg-primary/20 text-primary rounded-lg p-3 flex flex-col items-center justify-center min-w-[60px]">
-                    <span class="text-lg font-bold">9</span>
-                    <span class="text-xs">JUN</span>
-                  </div>
-                  <div>
-                    <h3 class="text-xl font-bold">Corte de Cabello</h3>
-                    <div class="flex items-center mt-1">
-                      <i class="far fa-clock text-gray-400 mr-1"></i>
-                      <span class="text-gray-400">11:00 AM - 11:30 AM</span>
-                    </div>
-                    <div class="flex items-center mt-2">
-                      <img
-                        src="https://via.placeholder.com/150"
-                        alt="Barbería"
-                        class="w-8 h-8 rounded-full mr-2"/>
-                      <span>El Corte Perfecto</span>
-                    </div>
-                    <div class="flex items-center mt-1">
-                      <i
-                        class="fas fa-map-marker-alt text-gray-400 mr-1"></i>
-                      <span class="text-gray-400">Calle Principal 123, Ciudad</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex flex-col space-y-2 mt-4 md:mt-0">
-                  <span
-                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
-                    <span
-                      class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                    Confirmada
-                  </span>
-                  <div class="flex space-x-2 mt-2">
-                    <button
-                      class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition duration-300">
-                      <i class="fas fa-calendar-alt mr-1"></i> Reprogramar
-                    </button>
-                    <button
-                      class="px-3 py-1 bg-red-900/30 hover:bg-red-900/50 text-red-400 rounded text-sm transition duration-300">
-                      <i class="fas fa-times mr-1"></i> Cancelar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cita 2 -->
-          <div class="bg-gray-800/50 rounded-lg overflow-hidden">
-            <div class="p-6">
-              <div
-                class="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div class="flex items-start space-x-4">
-                  <div
-                    class="bg-primary/20 text-primary rounded-lg p-3 flex flex-col items-center justify-center min-w-[60px]">
-                    <span class="text-lg font-bold">15</span>
-                    <span class="text-xs">JUN</span>
-                  </div>
-                  <div>
-                    <h3 class="text-xl font-bold">Afeitado Clásico</h3>
-                    <div class="flex items-center mt-1">
-                      <i class="far fa-clock text-gray-400 mr-1"></i>
-                      <span class="text-gray-400">2:00 PM - 2:20 PM</span>
-                    </div>
-                    <div class="flex items-center mt-2">
-                      <img
-                        src="https://via.placeholder.com/150"
-                        alt="Barbería"
-                        class="w-8 h-8 rounded-full mr-2"
-                      />
-                      <span>Barber Shop Premium</span>
-                    </div>
-                    <div class="flex items-center mt-1">
-                      <i
-                        class="fas fa-map-marker-alt text-gray-400 mr-1"></i>
-                      <span class="text-gray-400">Av. Central 456, Ciudad</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex flex-col space-y-2 mt-4 md:mt-0">
-                  <span
-                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-400">
-                    <span
-                      class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
-                    Pendiente
-                  </span>
-                  <div class="flex space-x-2 mt-2">
-                    <button
-                      class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition duration-300">
-                      <i class="fas fa-calendar-alt mr-1"></i> Reprogramar
-                    </button>
-                    <button
-                      class="px-3 py-1 bg-red-900/30 hover:bg-red-900/50 text-red-400 rounded text-sm transition duration-300">
-                      <i class="fas fa-times mr-1"></i> Cancelar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Barberías recomendadas -->
-    <div class="mb-12">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Barberías Recomendadas</h2>
-        <a
-          href="explorar.html"
-          class="text-primary hover:text-purple-400 transition duration-300 flex items-center">
-          Ver más
-          <i class="fas fa-chevron-right ml-2 text-sm"></i>
-        </a>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Barbería 1 -->
-        <div
-          class="bg-surface rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1">
-          <img
-            src="https://via.placeholder.com/400x200"
-            alt="El Corte Perfecto"
-            class="w-full h-48 object-cover"/>
-          <div class="p-5">
-            <div class="flex justify-between items-start">
-              <div>
-                <h3 class="font-bold text-lg">El Corte Perfecto</h3>
-                <div class="flex items-center mt-1">
-                  <div class="flex text-yellow-400">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                  </div>
-                  <span class="text-gray-400 text-sm ml-2">(120)</span>
-                </div>
-              </div>
-              <span
-                class="bg-green-900/30 text-green-400 text-xs px-2 py-1 rounded-full">Abierto</span>
-            </div>
-            <p class="text-gray-400 text-sm mt-2 mb-4">
-              Especialistas en cortes modernos y clásicos
-            </p>
-            <div class="flex items-center text-gray-400 text-sm mb-4">
-              <i class="fas fa-map-marker-alt mr-1"></i>
-              <span>Calle Principal 123, Ciudad</span>
-            </div>
-            <a
-              href="perfil-barberia.html"
-              class="block text-center bg-primary text-white py-2 rounded-md hover:bg-purple-700 transition duration-300">
-              Ver perfil
-            </a>
-          </div>
-        </div>
-
-        <!-- Barbería 2 -->
-        <div
-          class="bg-surface rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1">
-          <img
-            src="https://via.placeholder.com/400x200"
-            alt="Estilo Urbano"
-            class="w-full h-48 object-cover"/>
-          <div class="p-5">
-            <div class="flex justify-between items-start">
-              <div>
-                <h3 class="font-bold text-lg">Estilo Urbano</h3>
-                <div class="flex items-center mt-1">
-                  <div class="flex text-yellow-400">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                  </div>
-                  <span class="text-gray-400 text-sm ml-2">(95)</span>
-                </div>
-              </div>
-              <span
-                class="bg-green-900/30 text-green-400 text-xs px-2 py-1 rounded-full">Abierto</span>
-            </div>
-            <p class="text-gray-400 text-sm mt-2 mb-4">
-              Lo último en tendencias urbanas
-            </p>
-            <div class="flex items-center text-gray-400 text-sm mb-4">
-              <i class="fas fa-map-marker-alt mr-1"></i>
-              <span>Av. Moderna 789, Ciudad</span>
-            </div>
-            <a
-              href="perfil-barberia.html"
-              class="block text-center bg-primary text-white py-2 rounded-md hover:bg-purple-700 transition duration-300">
-              Ver perfil
-            </a>
-          </div>
-        </div>
-
-        <!-- Barbería 3 -->
-        <div
-          class="bg-surface rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1">
-          <img
-            src="https://via.placeholder.com/400x200"
-            alt="Barba & Co."
-            class="w-full h-48 object-cover"/>
-          <div class="p-5">
-            <div class="flex justify-between items-start">
-              <div>
-                <h3 class="font-bold text-lg">Barba & Co.</h3>
-                <div class="flex items-center mt-1">
-                  <div class="flex text-yellow-400">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="far fa-star"></i>
-                  </div>
-                  <span class="text-gray-400 text-sm ml-2">(78)</span>
-                </div>
-              </div>
-              <span class="bg-red-900/30 text-red-400 text-xs px-2 py-1 rounded-full">Cerrado</span>
-            </div>
-            <p class="text-gray-400 text-sm mt-2 mb-4">
-              Especialistas en barbas y tratamientos
-            </p>
-            <div class="flex items-center text-gray-400 text-sm mb-4">
-              <i class="fas fa-map-marker-alt mr-1"></i>
-              <span>Plaza Central 45, Ciudad</span>
-            </div>
-            <a
-              href="perfil-barberia.html"
-              class="block text-center bg-primary text-white py-2 rounded-md hover:bg-purple-700 transition duration-300">
-              Ver perfil
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-        
-  </div>
-</main>
-
-<!-- Pie de página -->
-<footer class="bg-surface mt-12 py-8">
+<footer class="bg-[#1F2937] py-8">  
   <div class="container mx-auto px-6">
-    <div class="flex flex-col md:flex-row justify-between items-center">
+    <div class="flex flex-col md:flex-row justify-between items-start">
       <div class="mb-6 md:mb-0">
-        <span
-          class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
-        >Trimly</span
-        >
-        <p class="text-gray-400 mt-2">
+        <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          Trimly
+        </span>
+        <p class="text-gray-400 mt-2 flex items-center">
+          <span class="w-2 h-2 rounded-full bg-primary mr-2 animate-pulse"></span>
           La mejor forma de reservar tu barbero.
         </p>
       </div>
-      <div class="flex space-x-8">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
         <div>
-          <h3 class="font-semibold mb-2">Empresa</h3>
-          <ul class="space-y-1">
+          <h3 class="font-semibold mb-3 text-gray-300 text-lg">Empresa</h3>
+          <ul class="space-y-2">
             <li>
-              <a
-                href="#"
-                class="text-gray-400 hover:text-white transition duration-300"
-              >Sobre nosotros</a>
+              <a href="#" class="text-gray-400 hover:text-primary transition duration-300 flex items-center group">
+                <i class="fas fa-chevron-right text-xs mr-2 text-primary/50 group-hover:mr-3 transition-all"></i>
+                Sobre nosotros
+              </a>
             </li>
             <li>
-              <a
-                href="#"
-                class="text-gray-400 hover:text-white transition duration-300"
-              >Contacto</a>
-            </li>
-            <li>
-              <a
-                href="#"
-                class="text-gray-400 hover:text-white transition duration-300">Blog</a>
+              <a href="#" class="text-gray-400 hover:text-primary transition duration-300 flex items-center group">
+                <i class="fas fa-chevron-right text-xs mr-2 text-primary/50 group-hover:mr-3 transition-all"></i>
+                Contacto
+              </a>
             </li>
           </ul>
         </div>
         <div>
-          <h3 class="font-semibold mb-2">Legal</h3>
-          <ul class="space-y-1">
+          <h3 class="font-semibold mb-3 text-gray-300 text-lg">Legal</h3>
+          <ul class="space-y-2">
             <li>
-              <a
-                href="#"
-                class="text-gray-400 hover:text-white transition duration-300"
-              >Privacidad</a>
+              <a href="#" class="text-gray-400 hover:text-primary transition duration-300 flex items-center group">
+                <i class="fas fa-chevron-right text-xs mr-2 text-primary/50 group-hover:mr-3 transition-all"></i>
+                Privacidad
+              </a>
             </li>
             <li>
-              <a
-                href="#"
-                class="text-gray-400 hover:text-white transition duration-300">Términos</a>
+              <a href="#" class="text-gray-400 hover:text-primary transition duration-300 flex items-center group">
+                <i class="fas fa-chevron-right text-xs mr-2 text-primary/50 group-hover:mr-3 transition-all"></i>
+                Términos
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-3 text-gray-300 text-lg">Ayuda</h3>
+          <ul class="space-y-2">
+            <li>
+              <a href="#" class="text-gray-400 hover:text-primary transition duration-300 flex items-center group">
+                <i class="fas fa-chevron-right text-xs mr-2 text-primary/50 group-hover:mr-3 transition-all"></i>
+                Centro de ayuda
+              </a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-primary transition duration-300 flex items-center group">
+                <i class="fas fa-chevron-right text-xs mr-2 text-primary/50 group-hover:mr-3 transition-all"></i>
+                Preguntas frecuentes
+              </a>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <div
-      class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-      <p class="text-gray-400">
-        &copy; 2025 Trimly. Todos los derechos reservados.
+    <div class="border-t border-gray-700/30 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-gray-400 flex items-center">
+        <i class="far fa-copyright mr-2"></i> 2025 Trimly. Todos los derechos reservados.
       </p>
-      <div class="flex space-x-4 mt-4 md:mt-0">
-        <a
-          href="#"
-          class="text-gray-400 hover:text-primary transition duration-300">
-          <i class="fab fa-facebook-f"></i>
+      <div class="flex space-x-6 mt-4 md:mt-0">
+        <a href="#" class="text-gray-400 hover:text-primary transition duration-300 transform hover:scale-125">
+          <i class="fab fa-facebook-f text-lg"></i>
         </a>
-        <a
-          href="#"
-          class="text-gray-400 hover:text-primary transition duration-300">
-          <i class="fab fa-instagram"></i>
+        <a href="#" class="text-gray-400 hover:text-primary transition duration-300 transform hover:scale-125">
+          <i class="fab fa-instagram text-lg"></i>
         </a>
-        <a
-          href="#"
-          class="text-gray-400 hover:text-primary transition duration-300">
-          <i class="fab fa-twitter"></i>
+        <a href="#" class="text-gray-400 hover:text-primary transition duration-300 transform hover:scale-125">
+          <i class="fab fa-twitter text-lg"></i>
         </a>
       </div>
     </div>
@@ -450,13 +270,19 @@
     
 </body>
 
-@code
-{
-  private async Task Logout()
-  {
-    await AuthService.LogoutAsync();
-    
-    Navigation.NavigateTo("/login");
+@code {
+  private string userName;
+
+  protected override async Task OnInitializedAsync() {
+    var userId = await LocalStorage.GetItemAsync<string>("userId");
+    var response = await AuthService.GetAccountDetailsAsync(userId);
+    if (response.Data.FullName != null) {
+      userName = response.Data.FullName;
+    }
   }
   
+  private async Task Logout() {
+    await AuthService.LogoutAsync();
+    Navigation.NavigateTo("/login");
+  }
 }

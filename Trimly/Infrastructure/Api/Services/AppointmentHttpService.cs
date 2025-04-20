@@ -91,7 +91,29 @@ public class AppointmentHttpService : IAppointmentHttpService
             };
         }
     }
-    
+
+    public async Task<ApiResponse<AppointmentResponse>> CreateAppointmentAsync(CreateAppointmentsDTos request)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"api/v1/appointments", request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadFromJsonAsync<AppointmentResponse>();
+            return new ApiResponse<AppointmentResponse>()
+            {
+                Success = true,
+                Data = content
+            };
+        }
+
+        var errorContent = await response.Content.ReadFromJsonAsync<List<ValidationMessage>>();
+        return new ApiResponse<AppointmentResponse>()
+        {
+            Success = false,
+            ValidationMessages = errorContent
+        };
+    }
+
     private class ErrorResponse
     {
         public string Message { get; set; }
@@ -204,6 +226,5 @@ private async Task<ApiResponse<T>> HandleErrorResponse<T>(HttpResponseMessage re
         };
     }
 }
-   
 
 }

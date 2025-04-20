@@ -1,0 +1,384 @@
+@page "/barbershop/profile/{CompanyId}/reviews"
+@using Trimly.Core.Application.DTOs.Companies
+@using Trimly.Core.Application.DTOs.Reviews
+@using Trimly.Infrastructure.Api
+@inject IRegisteredCompanyService CompanyService
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+<div class="bg-background text-text min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-surface/90 backdrop-blur-lg shadow-xl sticky top-0 z-50 border-b border-white/5">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <NavLink href="/user/home" class="flex items-center group" aria-label="Trimly Home">
+            <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent group-hover:bg-gradient-to-l transition-all duration-500">Trimly</span>
+            <span class="ml-2 w-2 h-2 rounded-full bg-primary animate-pulse" aria-hidden="true"></span>
+          </NavLink>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="hidden md:flex items-center space-x-1" aria-label="Main navigation">
+          <NavLink href="/user/home" class="px-3 py-2 rounded-md text-sm font-medium relative group">
+            <span class="relative z-10 flex items-center">
+              <i class="fas fa-home mr-2 text-gray-400 group-hover:text-primary transition-colors" aria-hidden="true"></i>
+              Inicio
+            </span>
+            <span class="absolute bottom-0 left-0 h-0.5 bg-primary w-0 group-hover:w-full transition-all duration-300" aria-hidden="true"></span>
+          </NavLink>
+          <NavLink href="/explorer" class="px-3 py-2 rounded-md text-sm font-medium relative group">
+            <span class="relative z-10 flex items-center">
+              <i class="fas fa-search mr-2 text-gray-400 group-hover:text-primary transition-colors" aria-hidden="true"></i>
+              Explorar
+            </span>
+            <span class="absolute bottom-0 left-0 h-0.5 bg-primary w-0 group-hover:w-full transition-all duration-300" aria-hidden="true"></span>
+          </NavLink>
+          <NavLink href="/appointments" class="px-3 py-2 rounded-md text-sm font-medium relative group">
+            <span class="relative z-10 flex items-center">
+              <i class="fas fa-calendar-alt mr-2 text-gray-400 group-hover:text-primary transition-colors" aria-hidden="true"></i>
+              Mis Citas
+            </span>
+            <span class="absolute bottom-0 left-0 h-0.5 bg-primary w-0 group-hover:w-full transition-all duration-300" aria-hidden="true"></span>
+          </NavLink>
+        </nav>
+
+        <!-- Profile Menu -->
+        <div class="flex items-center space-x-4">
+          <div class="relative group" role="button" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
+            <div class="flex items-center space-x-1 p-1 rounded-full hover:bg-gray-700/50 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50">
+              <div class="relative">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_12px_-2px_rgba(99,102,241,0.5)] group-hover:shadow-[0_0_16px_-1px_rgba(99,102,241,0.7)] transition-all duration-500">
+                  <i class="fas fa-user-astronaut text-sm text-white/90" aria-hidden="true"></i>
+                </div>
+                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-gray-800" aria-hidden="true"></span>
+              </div>
+              <i class="fas fa-chevron-down text-xs hidden md:block transition-transform duration-300 group-hover:rotate-180" aria-hidden="true"></i>
+            </div>
+
+            <div class="absolute right-0 mt-2 w-48 bg-surface rounded-lg shadow-2xl py-1 z-50 border border-gray-700/30 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right transform scale-95 group-hover:scale-100">
+              <NavLink href="/account/details" class="block px-4 py-2 text-sm hover:bg-gray-700/50 transition-colors duration-300 flex items-center focus:outline-none focus:bg-gray-700/50">
+                <i class="fas fa-cog mr-2 text-primary/80" aria-hidden="true"></i>
+                Configuración
+              </NavLink>
+              <div class="border-t border-gray-700/30 my-1" aria-hidden="true"></div>
+              <button @onclick="Logout" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700/50 transition-colors duration-300 flex items-center focus:outline-none focus:bg-gray-700/50">
+                <i class="fas fa-sign-out-alt mr-2 text-primary/80" aria-hidden="true"></i>
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow">
+    @if (isLoading)
+    {
+      <div class="flex justify-center items-center h-screen" aria-live="polite" aria-busy="true">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-hidden="true"></div>
+        <span class="sr-only">Cargando...</span>
+      </div>
+    }
+    else if (company == null)
+    {
+      <div class="text-center py-12">
+        <i class="fas fa-cut text-4xl text-gray-500 mb-4" aria-hidden="true"></i>
+        <h3 class="text-xl font-medium text-gray-400">Barbería no encontrada</h3>
+        <p class="text-gray-500 mt-2">No pudimos encontrar la barbería solicitada</p>
+        <button @onclick="@(() => NavigationManager.NavigateTo("/explorer"))" 
+                class="mt-4 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background">
+          Volver al explorador
+        </button>
+      </div>
+    }
+else
+    {
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumbs -->
+        <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+          <ol class="flex items-center space-x-2">
+            <li>
+              <NavLink href="/user/home" class="text-gray-400 hover:text-primary transition-colors">
+                <i class="fas fa-home" aria-hidden="true"></i>
+                <span class="sr-only">Inicio</span>
+              </NavLink>
+            </li>
+            <li class="flex items-center">
+              <span class="text-gray-500 mx-2">/</span>
+              <NavLink href="@($"/barbershop/profile/{company.RegisteredCompaniesId}")" class="text-gray-400 hover:text-primary transition-colors">
+                @company.Name
+              </NavLink>
+            </li>
+            <li class="flex items-center">
+              <span class="text-gray-500 mx-2">/</span>
+              <span class="text-gray-300">Reseñas</span>
+            </li>
+          </ol>
+        </nav>
+
+        <!-- Reviews Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          <div class="flex items-center">
+            <div class="w-16 h-16 rounded-full bg-surface border-2 border-white/10 shadow-lg overflow-hidden mr-4">
+              @if (!string.IsNullOrEmpty(company.LogoUrl))
+              {
+                <img src="@company.LogoUrl" alt="Logo @company.Name" class="w-full h-full object-cover" />
+              }
+              else
+              {
+                <div class="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                  <i class="fas fa-cut text-2xl text-white/30" aria-hidden="true"></i>
+                </div>
+              }
+            </div>
+            <div>
+              <!-- Nombre dinámico de la barbería -->
+              <h1 class="text-2xl font-bold">Reseñas de @company.Name</h1>
+              <div class="flex items-center mt-1">
+                <div class="flex text-yellow-400 mr-2" aria-label="4.5 estrellas">
+                  <i class="fas fa-star" aria-hidden="true"></i>
+                  <i class="fas fa-star" aria-hidden="true"></i>
+                  <i class="fas fa-star" aria-hidden="true"></i>
+                  <i class="fas fa-star" aria-hidden="true"></i>
+                  <i class="fas fa-star-half-alt" aria-hidden="true"></i>
+                </div>
+                <span class="text-gray-300">4.5</span>
+                <span class="text-gray-500 mx-2">•</span>
+                <span class="text-gray-400">24 reseñas</span>
+              </div>
+            </div>
+          </div>
+          <button @onclick="ToggleReviewForm" class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background flex items-center justify-center gap-2 w-full md:w-auto">
+            <i class="fas fa-pen" aria-hidden="true"></i>
+            Escribir una reseña
+          </button>
+        </div>
+      
+        
+        <!-- Reviews List -->
+        <div class="space-y-6">
+          <!-- Review 1 -->
+          <div class="bg-surface rounded-xl p-6 border border-gray-700/20 shadow-sm">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                <i class="fas fa-user text-white/70"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h3 class="font-semibold">Carlos Rodríguez</h3>
+                    <p class="text-gray-400 text-sm">Hace 2 días</p>
+                  </div>
+                  <div class="flex text-yellow-400 text-sm" aria-label="5 estrellas">
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                  </div>
+                </div>
+                <!-- Ejemplo de reseña haciendo referencia al nombre correcto -->
+                <h4 class="font-medium mt-3">Excelente servicio en @company.Name</h4>
+                <p class="text-gray-300 mt-2">El corte de pelo fue exactamente lo que pedí en @company.Name. El barbero fue muy profesional y me dio buenos consejos para el cuidado del cabello. El ambiente es muy agradable y moderno. Definitivamente volveré.</p>
+                
+                <!-- Service Tag -->
+                <div class="mt-4">
+                  <span class="inline-block bg-gray-700/50 text-gray-300 text-xs px-2 py-1 rounded-full">
+                    Corte de cabello
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Review 2 -->
+          <div class="bg-surface rounded-xl p-6 border border-gray-700/20 shadow-sm">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                <i class="fas fa-user text-white/70"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h3 class="font-semibold">María López</h3>
+                    <p class="text-gray-400 text-sm">Hace 1 semana</p>
+                  </div>
+                  <div class="flex text-yellow-400 text-sm" aria-label="4 estrellas">
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    <i class="far fa-star" aria-hidden="true"></i>
+                  </div>
+                </div>
+                <!-- Otra reseña con el nombre correcto -->
+                <h4 class="font-medium mt-3">Muy buen servicio en @company.Name</h4>
+                <p class="text-gray-300 mt-2">Llevé a mi hijo para un corte de pelo en @company.Name y quedó muy contento. El personal es amable y el lugar está muy limpio. El único detalle es que tuvimos que esperar un poco más de lo previsto.</p>
+                
+                <!-- Service Tag -->
+                <div class="mt-4">
+                  <span class="inline-block bg-gray-700/50 text-gray-300 text-xs px-2 py-1 rounded-full">
+                    Corte infantil
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+    @if (showReviewForm)
+    {
+      <div class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm" 
+           @onclick="ToggleReviewForm">
+        <div class="bg-surface rounded-2xl max-w-md w-full p-6 border border-gray-700/30 shadow-2xl"
+             @onclick:stopPropagation>
+          <!-- Encabezado -->
+          <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-700/30">
+            <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Tu Reseña
+            </h3>
+            <button @onclick="ToggleReviewForm" 
+                    class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fas fa-times text-lg"></i>
+            </button>
+          </div>
+            
+          <div class="space-y-5">
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-2">Calificación</label>
+      <Rating @bind-SelectedValue="createReviews.Rating"
+              MaxValue="5"
+              FullIcon="IconName.Star"
+              EmptyIcon="IconName.Star"
+              FullIconClass="full-star"
+              EmptyIconClass="empty-star"
+              IconSize="IconSize.ExtraLarge" />
+    </div>
+    
+
+    <!-- Título -->
+    <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Título</label>
+        <input type="text" 
+               class="w-full bg-gray-800/30 border border-gray-700 rounded-xl px-4 py-3 text-white 
+                      focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+               placeholder="Ej: ¡Excelente experiencia!" />
+    </div>
+    
+    <!-- Comentario -->
+    <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Detalles</label>
+        <textarea class="w-full bg-gray-800/30 border border-gray-700 rounded-xl px-4 py-3 text-white 
+                         focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+                  rows="3"
+                  placeholder="Describe tu experiencia..."></textarea>
+    </div>
+    
+    <!-- Servicio -->
+    <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Servicio recibido</label>
+        <div class="relative">
+            <select class="w-full bg-gray-800/30 border border-gray-700 rounded-xl px-4 py-3 text-white 
+                          focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent
+                          appearance-none">
+                <option value="">Selecciona un servicio</option>
+                <option value="Corte de cabello">Corte de cabello</option>
+                <option value="Afeitado">Afeitado</option>
+                <option value="Corte y barba">Corte y barba</option>
+                <option value="Tinte">Tinte</option>
+                <option value="Otro">Otro</option>
+            </select>
+            <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                <i class="fas fa-chevron-down text-gray-400"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botón de enviar -->
+    <div class="pt-2">
+        <button class="w-full bg-gradient-to-br from-primary to-purple-600 
+                       text-white py-3 px-6 rounded-xl transition-colors duration-300 font-medium
+                       hover:from-primary/90 hover:to-purple-600/90">
+            <i class="fas fa-paper-plane mr-2"></i>
+            Enviar Reseña
+        </button>
+    </div>
+</div>
+        </div>
+    </div>
+}    
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface/80 border-t border-gray-700/20 py-8 mt-12">
+    <div class="container mx-auto px-6">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Trimly
+          </span>
+        </div>
+        <div class="flex space-x-6">
+          <a href="#" class="text-gray-400 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-surface rounded-full p-2" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-surface rounded-full p-2" aria-label="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-surface rounded-full p-2" aria-label="Twitter">
+            <i class="fab fa-twitter"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+@code {
+  [Parameter]
+  public string CompanyId { get; set; }
+  private CreateReviewsDTO createReviews = new();
+  private bool isLoading = true;
+  private RegisteredCompaniesDTO company;
+  private bool showReviewForm = false;
+  
+
+  protected override async Task OnInitializedAsync()
+  {
+    if (!Guid.TryParse(CompanyId, out var companyId))
+    {
+      NavigationManager.NavigateTo("/explorer");
+      return;
+    }
+
+    var companyResponse = await CompanyService.GetRegisteredCompanyById(companyId);
+    if (!companyResponse.Success || companyResponse.Data == null)
+    {
+      NavigationManager.NavigateTo("/explorer");
+      return;
+    }
+
+    company = companyResponse.Data;
+    isLoading = false;
+  }
+
+  private void ToggleReviewForm()
+  {
+    showReviewForm = !showReviewForm;
+    if (showReviewForm)
+    {
+      createReviews = new CreateReviewsDTO { Rating = 0 };
+    }
+
+  }
+
+  private async Task Logout()
+  {
+    await AuthService.LogoutAsync();
+    NavigationManager.NavigateTo("/login");
+  }
+}
