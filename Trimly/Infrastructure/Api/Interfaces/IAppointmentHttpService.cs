@@ -15,6 +15,8 @@ public interface IAppointmentHttpService
     Task<ApiResponse<PagedResponse<AppointmentDTos>>> PaginationAppointmentsAsync(
         int pageNumber, 
         int pageSize );
+    
+    Task<ApiResponse<RescheduleAppointmentDTos>> RescheduleAppointmentAsync(Guid appointmentId, RescheduleAppointmentDTos request);
 
     Task<ApiResponse<IEnumerable<AppointmentDTos>>> GetAppointmentsByStatusAsync(AppointmentStatus status);
 }
