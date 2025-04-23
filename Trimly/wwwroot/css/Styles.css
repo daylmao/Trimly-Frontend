@@ -192,3 +192,146 @@
 .animate-button-particle { animation-name: button-particle; }
 .animate-ping-slow { animation-name: ping-slow; animation-iteration-count: infinite; }
 .animate-scissors-flash { animation-name: scissors-flash; animation-iteration-count: infinite; animation-duration: 2s; }
+
+
+
+--------------
+    /* Custom CSS for 3D transforms */
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes spin-slow-reverse {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+}
+
+@keyframes float-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes float-rotate {
+    0%, 100% { transform: translateY(0) rotate(45deg); }
+    50% { transform: translateY(-15px) rotate(45deg); }
+}
+
+@keyframes float-rotate-reverse {
+    0%, 100% { transform: translateY(0) rotate(-45deg); }
+    50% { transform: translateY(-15px) rotate(-45deg); }
+}
+
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes orbit {
+    from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+}
+
+@keyframes wave-slow {
+    0% { transform: translateX(0) translateY(0); }
+    50% { transform: translateX(-25%) translateY(10px); }
+    100% { transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes float-wave {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+
+/* Animaciones personalizadas */
+@keyframes float {
+     0%, 100% { transform: translateY(0); }
+     50% { transform: translateY(-10px); }
+ }
+@keyframes float-delay-1 {
+     0%, 100% { transform: translateY(0); }
+     50% { transform: translateY(-15px); }
+ }
+@keyframes float-delay-2 {
+     0%, 100% { transform: translateY(0); }
+     50% { transform: translateY(-20px); }
+ }
+@keyframes float-delay-3 {
+     0%, 100% { transform: translateY(0); }
+     50% { transform: translateY(-25px); }
+ }
+@keyframes spin-slow {
+     0% { transform: rotate(0deg); }
+     100% { transform: rotate(360deg); }
+ }
+@keyframes spin-slow-reverse {
+     0% { transform: rotate(0deg); }
+     100% { transform: rotate(-360deg); }
+ }
+@keyframes pulse-slow {
+     0%, 100% { opacity: 0.6; }
+     50% { opacity: 1; }
+ }
+@keyframes bounce-slow {
+     0%, 100% { transform: translateY(0); }
+     50% { transform: translateY(-5px); }
+ }
+@keyframes text-pulse {
+     0%, 100% { opacity: 1; }
+     50% { opacity: 0.8; }
+ }
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delay-1 { animation: float-delay-1 7s ease-in-out infinite; }
+.animate-float-delay-2 { animation: float-delay-2 8s ease-in-out infinite; }
+.animate-float-delay-3 { animation: float-delay-3 9s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 20s linear infinite; }
+.animate-spin-slow-reverse { animation: spin-slow-reverse 25s linear infinite; }
+.animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+.animate-bounce-slow { animation: bounce-slow 3s ease-in-out infinite; }
+.animate-text-pulse { animation: text-pulse 2s ease-in-out infinite; }
+
+---
+
+.wave-container {
+    perspective: 100px;
+}
+
+@keyframes wave-movement {
+    0%, 100% {
+        transform: translate3d(0, 0, 0);
+    }
+    25% {
+        transform: translate3d(-5%, -3px, 0);
+    }
+    50% {
+        transform: translate3d(0, 0, 0);
+    }
+    75% {
+        transform: translate3d(5%, 3px, 0);
+    }
+}
+
+@keyframes wave-deformation {
+    0%, 100% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(1.05);
+    }
+}
+
+.wave-animation {
+    animation:
+            wave-movement 12s ease-in-out infinite,
+            wave-deformation 8s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+.wave-animation-delay {
+    animation:
+            wave-movement 14s ease-in-out -2s infinite,
+            wave-deformation 10s ease-in-out -1s infinite;
+    transform-origin: center bottom;
+}

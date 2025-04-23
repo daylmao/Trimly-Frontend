@@ -1,7 +1,13 @@
 @page "/barber-dashboard"
-@using Microsoft.AspNetCore.Authorization
+@using Trimly.Core.Application.DTOs.Account
+@using Trimly.Core.Application.DTOs.Appointment
+@using Trimly.Core.Application.Pagination
+@using Trimly.Core.Domain.Enums
+@using Trimly.Infrastructure.Api
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
+@inject IAppointmentHttpService _appointmentService
+@inject ILocalStorageService LocalStorage
 @attribute [Authorize(Roles = ("Barber"))]
 
 <body class="min-h-screen bg-background text-text">
@@ -22,8 +28,6 @@
                         Dashboard
                     </NavLink>
                 </li>
-
-
             </ul>
 
             <div class="mt-8 px-4">
@@ -49,13 +53,31 @@
 
         <!-- User -->
         <div class="p-4 border-t border-gray-700">
-            <div class="flex items-center">
-                <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
-                <div>
-                    <p class="text-sm font-medium">Miguel Ángel</p>
-                    <p class="text-xs text-gray-400">Barbero</p>
+            <div class="flex items-center justify-between">
+                <div class="relative">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center">
+                        @if (!string.IsNullOrEmpty(_profileDto?.FirstName) || !string.IsNullOrEmpty(_profileDto?.LastName))                        {
+                            <span class="text-white text-sm font-medium">
+                                @GetInitial(_profileDto?.FirstName)@GetInitial(_profileDto?.LastName)
+                            </span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-user text-white/90"></i>
+                        }
+                    </div>
                 </div>
-                <button id="logout-sidebar-button" class="ml-auto text-gray-400 hover:text-white">
+
+                <div class="flex-1 px-3 overflow-hidden">
+                    <p class="text-sm font-medium tracking-wide text-gray-100 truncate">
+                        @(_profileDto?.FullName ?? "Mi Cuenta")
+                    </p>
+                    <p class="text-xs text-gray-400 font-medium truncate">
+                        Barbero
+                    </p>
+                </div>
+
+                <button @onclick="Logout" class="p-2 rounded-full text-gray-400 hover:text-white transition-colors">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -93,7 +115,6 @@
                             Dashboard
                         </NavLink>
                     </li>
-
                 </ul>
 
                 <div class="mt-8 px-4">
@@ -119,13 +140,32 @@
 
             <!-- User -->
             <div class="p-4 border-t border-gray-700">
-                <div class="flex items-center">
-                    <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
-                    <div>
-                        <p class="text-sm font-medium">Miguel Ángel</p>
-                        <p class="text-xs text-gray-400">Barbero</p>
+                <div class="flex items-center justify-between">
+                    <div class="relative">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center">
+                            @if (!string.IsNullOrEmpty(_profileDto?.FirstName) || !string.IsNullOrEmpty(_profileDto?.LastName))
+                            {
+                                <span class="text-white text-sm font-medium">
+                                    @GetInitial(_profileDto?.FirstName)@GetInitial(_profileDto?.LastName)
+                                </span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-user text-white/90"></i>
+                            }
+                        </div>
                     </div>
-                    <button @onclick="Logout" id="logout-mobile-button" class="ml-auto text-gray-400 hover:text-white">
+
+                    <div class="flex-1 px-3 overflow-hidden">
+                        <p class="text-sm font-medium tracking-wide text-gray-100 truncate">
+                            @(_profileDto?.FullName ?? "Mi Cuenta")
+                        </p>
+                        <p class="text-xs text-gray-400 font-medium truncate">
+                            Barbero
+                        </p>
+                    </div>
+
+                    <button @onclick="Logout" class="p-2 rounded-full text-gray-400 hover:text-white transition-colors">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
@@ -140,12 +180,10 @@
             <div class="px-4 py-4 flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-semibold">Dashboard</h1>
-                    <p class="text-sm text-gray-400">Bienvenido, Miguel Ángel</p>
+                    <p class="text-sm text-gray-400">Bienvenido, @(_profileDto?.FirstName ?? "Barbero")</p>
                 </div>
 
                 <div class="flex items-center space-x-4">
-
-
                 </div>
             </div>
         </header>
@@ -155,33 +193,7 @@
             <!-- Quick Stats -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <!-- Today's Appointments -->
-                <div class="bg-surface rounded-lg shadow-md p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-primary/10 text-primary mr-4">
-                            <i class="fas fa-calendar-day text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400">Citas Hoy</p>
-                            <p class="text-2xl font-semibold">5</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pending Appointments -->
-                <div class="bg-surface rounded-lg shadow-md p-4">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-yellow-500/10 text-yellow-500 mr-4">
-                            <i class="fas fa-clock text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400">Citas Pendientes</p>
-                            <p class="text-2xl font-semibold">12</p>
-                        </div>
-                    </div>
-                </div>
             </div>
-
-
 
             <!-- Today's Schedule -->
             <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
@@ -198,7 +210,6 @@
                         <thead>
                         <tr class="text-left text-xs text-gray-400 border-b border-gray-700">
                             <th class="pb-3 pl-2">Hora</th>
-                            <th class="pb-3">Cliente</th>
                             <th class="pb-3">Servicio</th>
                             <th class="pb-3">Duración</th>
                             <th class="pb-3">Estado</th>
@@ -206,136 +217,84 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr class="border-b border-gray-700">
+                        @if (pagedAppointments.Items.Any())
+                        {
+                        foreach (var appointment in pagedAppointments.Items)
+                        {
+                        <!-- Esta es la línea que debes modificar/reemplazar -->
+                        <tr @key="appointment.AppointmentId"
+                            class="border-b border-gray-700 @GetRowClass(appointment)">
+
                             <td class="py-3 pl-2">
-                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">10:00 AM</span>
+                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
+                        @appointment.StartDateTime?.ToString("hh:mm tt")
+                    </span>
+                            </td>
+                            <td class="py-3">@appointment.ServiceId</td>
+                            <td class="py-3">
+                                @{
+                                var duration = appointment.EndDateTime - appointment.StartDateTime;
+                                <text>@duration?.TotalMinutes min</text>
+                                }
                             </td>
                             <td class="py-3">
-                                <div class="flex items-center">
-                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
-                                    <span>Carlos Rodríguez</span>
-                                </div>
+                                @{
+                                var realStatus = appointment.AppointmentStatus;
+                                var statusDisplay = realStatus switch
+                                {
+                                AppointmentStatus.Pending => ("bg-yellow-100 text-yellow-800", "Pendiente"),
+                                AppointmentStatus.Confirmed => ("bg-green-100 text-green-800", "Confirmada"),
+                                AppointmentStatus.Cancelled => ("bg-red-100 text-red-800", "Cancelada"),
+                                _ => ("bg-gray-100 text-gray-800", "Indefinido")
+                                };
+                                }
+                                <span class="px-3 py-1 @statusDisplay.Item1 rounded-full text-xs font-medium">
+                                    @statusDisplay.Item2
+                                </span>
                             </td>
-                            <td class="py-3">Corte de cabello</td>
-                            <td class="py-3">30 min</td>
                             <td class="py-3">
-                                <span class="px-2 py-1 bg-green-500/20 text-green-500 rounded-full text-xs">Confirmada</span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex space-x-2">
-                                    <button class="text-gray-400 hover:text-white">
+                                <div class="flex space-x-2 items-center">
+                                    @if (appointment.AppointmentStatus == AppointmentStatus.Pending)
+                                    {
+                                    <!-- Botón Confirmar -->
+                                    <button class="text-green-500 hover:text-white relative"
+                                            @onclick="() => ConfirmAppointment(appointment.AppointmentId, appointment.ServiceId)"
+                                            disabled="@(isProcessing && currentProcessingId == appointment.AppointmentId)">
                                         <i class="fas fa-check-circle"></i>
+                                        @if (isProcessing && currentProcessingId == appointment.AppointmentId)
+                                        {
+                                        <span class="absolute -right-5">
+                                            <i class="fas fa-spinner fa-spin text-gray-500"></i>
+                                        </span>
+                                        }
                                     </button>
-                                    <button class="text-gray-400 hover:text-white">
+
+                                    <!-- Botón Cancelar -->
+                                    <button class="text-red-500 hover:text-white"
+                                            @onclick="() => CancelAppointment(appointment.AppointmentId)"
+                                            disabled="@(isProcessing && currentProcessingId == appointment.AppointmentId)">
                                         <i class="fas fa-times-circle"></i>
                                     </button>
+                                    }
+                                    else if (appointment.AppointmentStatus == AppointmentStatus.Cancelled)
+                                    {
+                                    <span class="text-gray-500 text-sm">Cancelada</span>
+                                    }
+                                    else if (appointment.AppointmentStatus == AppointmentStatus.Confirmed)
+                                    {
+                                    <span class="text-green-500 text-sm">Confirmada</span>
+                                    }
                                 </div>
                             </td>
                         </tr>
-                        <tr class="border-b border-gray-700">
-                            <td class="py-3 pl-2">
-                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">11:30 AM</span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex items-center">
-                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
-                                    <span>Ana Martínez</span>
-                                </div>
-                            </td>
-                            <td class="py-3">Afeitado tradicional</td>
-                            <td class="py-3">25 min</td>
-                            <td class="py-3">
-                                <span class="px-2 py-1 bg-green-500/20 text-green-500 rounded-full text-xs">Confirmada</span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex space-x-2">
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-check-circle"></i>
-                                    </button>
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-700">
-                            <td class="py-3 pl-2">
-                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">12:00 PM</span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex items-center">
-                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
-                                    <span>Pedro Sánchez</span>
-                                </div>
-                            </td>
-                            <td class="py-3">Corte y afeitado</td>
-                            <td class="py-3">45 min</td>
-                            <td class="py-3">
-                                <span class="px-2 py-1 bg-blue-500/20 text-blue-500 rounded-full text-xs">En progreso</span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex space-x-2">
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-check-circle"></i>
-                                    </button>
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-700">
-                            <td class="py-3 pl-2">
-                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">15:00 PM</span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex items-center">
-                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
-                                    <span>Laura García</span>
-                                </div>
-                            </td>
-                            <td class="py-3">Corte de cabello</td>
-                            <td class="py-3">30 min</td>
-                            <td class="py-3">
-                                <span class="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-xs">Pendiente</span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex space-x-2">
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-check-circle"></i>
-                                    </button>
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                        }
+                        }
+                        else
+                        {
                         <tr>
-                            <td class="py-3 pl-2">
-                                <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs">16:30 PM</span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex items-center">
-                                    <img src="https://via.placeholder.com/40" alt="Cliente" class="w-8 h-8 rounded-full mr-3">
-                                    <span>Marta López</span>
-                                </div>
-                            </td>
-                            <td class="py-3">Corte y peinado</td>
-                            <td class="py-3">40 min</td>
-                            <td class="py-3">
-                                <span class="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-xs">Pendiente</span>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex space-x-2">
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-check-circle"></i>
-                                    </button>
-                                    <button class="text-gray-400 hover:text-white">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
-                                </div>
-                            </td>
+                            <td colspan="5" class="text-center py-4 text-gray-400">No hay citas disponibles.</td>
                         </tr>
+                        }
                         </tbody>
                     </table>
                 </div>
@@ -347,10 +306,179 @@
 </body>
 
 @code {
+    private PagedResponse<AppointmentDTos> pagedAppointments = new();
+    private int currentPage = 2;
+    private int pageSize = 10;
+    private bool isProcessing = false;
+    private Guid? currentProcessingId = null;
+    private System.Threading.Timer refreshTimer;
+    private ProfileDTO _profileDto = new();
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProfileData();
+        await LoadAppointments();
+        refreshTimer = new System.Threading.Timer(async _ => 
+        {
+            await InvokeAsync(async () =>
+            {
+                await LoadAppointments();
+                StateHasChanged();
+            });
+        }, null, 60000, 60000);
+    }
+    
+
+    private async Task LoadProfileData()
+    {
+        try
+        {
+            var userId = await LocalStorage.GetItemAsync<string>("userId");
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var response = await AuthService.GetAccountDetailsAsync(userId);
+            
+                if (response?.Success == true && response.Data != null)
+                {
+                    _profileDto = response.Data;
+                    StateHasChanged(); 
+                }
+                else
+                {
+                    Console.WriteLine("No se pudo cargar el perfil del usuario");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No se encontró userId en localStorage");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading profile: {ex.Message}");
+        }
+    }
+    private string GetInitial(string name)
+    {
+        return !string.IsNullOrEmpty(name) ? name[0].ToString().ToUpper() : "";
+    }
+    
+    public void Dispose()
+    {
+        refreshTimer?.Dispose();
+    }
+    
+    private string GetRowClass(AppointmentDTos appointment)
+    {
+        return appointment.AppointmentStatus switch
+        {
+            AppointmentStatus.Confirmed => "confirmed-row",
+            AppointmentStatus.Cancelled => "cancelled-row",
+            _ => ""
+        };
+    }
+    
+    private async Task LoadAppointments()
+    {
+        var response = await _appointmentService.PaginationAppointmentsAsync(
+            pageNumber: currentPage,
+            pageSize: pageSize);
+
+        if (response.Success)
+        {
+            pagedAppointments = new PagedResponse<AppointmentDTos>
+            {
+                Items = new List<AppointmentDTos>(response.Data.Items), 
+                TotalCount = response.Data.TotalCount,
+                PageNumber = response.Data.PageNumber,
+                PageSize = response.Data.PageSize
+            };
+        }
+        else
+        {
+            pagedAppointments = new PagedResponse<AppointmentDTos>();
+        }
+        StateHasChanged(); // Forzar actualización de UI
+    }
+    
+   private async Task ConfirmAppointment(Guid appointmentId, Guid serviceId)
+{
+    try
+    {
+        isProcessing = true;
+        currentProcessingId = appointmentId;
+        StateHasChanged(); 
+
+        var response = await _appointmentService.ConfirmAppointmentAsync(appointmentId, serviceId);
+        
+        if (response.Success)
+        {
+
+            var appointment = pagedAppointments.Items.FirstOrDefault(a => a.AppointmentId == appointmentId);
+            if (appointment != null)
+            {
+                appointment.AppointmentStatus = AppointmentStatus.Confirmed;
+            }
+            
+            pagedAppointments.Items = new List<AppointmentDTos>(pagedAppointments.Items);
+            StateHasChanged();
+        }
+    }
+    finally
+    {
+        isProcessing = false;
+        currentProcessingId = null;
+        StateHasChanged();
+    }
+}
+
+private async Task CancelAppointment(Guid appointmentId)
+{
+    try
+    {
+        isProcessing = true;
+        currentProcessingId = appointmentId;
+        StateHasChanged();
+        
+        var appointment = pagedAppointments.Items.FirstOrDefault(a => a.AppointmentId == appointmentId);
+        if (appointment != null)
+        {
+            appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+            StateHasChanged();
+        }
+        
+        var response = await _appointmentService.CanceledAppointmentAsync(appointmentId);
+
+        if (response?.Success == true)
+        {
+            await Task.Delay(500); // Pequeño retraso para feedback visual
+            
+            pagedAppointments.Items = pagedAppointments.Items
+                .Where(a => a.AppointmentId != appointmentId)
+                .ToList();
+                
+            pagedAppointments.TotalCount--;
+
+            StateHasChanged();
+        }
+        else if (appointment != null)
+        {
+            appointment.AppointmentStatus = AppointmentStatus.Pending;
+            StateHasChanged();
+        }
+    }
+    finally
+    {
+        isProcessing = false;
+        currentProcessingId = null;
+        StateHasChanged();
+    }
+}
+    
     private async Task Logout()
     {
         await AuthService.LogoutAsync();
-    
         Navigation.NavigateTo("/login");
     }
 }

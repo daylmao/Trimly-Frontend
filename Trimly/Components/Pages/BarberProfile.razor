@@ -1,245 +1,260 @@
 @page "/barber/profile"
+@using Trimly.Core.Application.DTOs.Account
+@inject IAuthService AuthService
+@inject CustomAuthStateProvider CustomAuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
 
 <body class="min-h-screen bg-background text-text">
 <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="hidden md:flex md:flex-col w-64 bg-surface border-r border-gray-700">
-        <!-- Logo -->
-        <div class="p-4 border-b border-gray-700">
-            <NavLink href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Trimly
+  <!-- Sidebar -->
+  <aside class="hidden md:flex md:flex-col w-64 bg-surface border-r border-gray-700">
+    <!-- Logo -->
+    <div class="p-4 border-b border-gray-700">
+      <NavLink href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        Trimly
+      </NavLink>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto py-4">
+      <ul class="space-y-1 px-2">
+        <li>
+          <NavLink href="/barber-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+            <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+            Dashboard
+          </NavLink>
+        </li>
+      </ul>
+
+      <!-- Configuración Section -->
+      <div class="mt-8 px-4">
+        <h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          Configuración
+        </h3>
+        <ul class="mt-2 space-y-1">
+          <li>
+            <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
+              <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
+              Mi Perfil
             </NavLink>
+          </li>
+          <li>
+            <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
+              <i class="fas fa-cog w-5 h-5 mr-3"></i>
+              Ajustes
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- User Info -->
+    <div class="px-4 py-3 border-t border-gray-800/50">
+      <div class="flex items-center justify-between">
+        <div class="relative">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center">
+            @if (!string.IsNullOrEmpty(_profileDto?.FirstName) || !string.IsNullOrEmpty(_profileDto?.LastName))
+            {
+              <span class="text-white text-sm font-medium">
+                @GetInitial(_profileDto?.FirstName)@GetInitial(_profileDto?.LastName)
+              </span>
+            }
+            else
+            {
+              <i class="fas fa-user text-white/90"></i>
+            }
+          </div>
         </div>
 
-        <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto py-4">
-            <ul class="space-y-1 px-2">
-                <li>
-                    <NavLink href="/barber-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
-                        Dashboard
-                    </NavLink>
-                </li>
-
-            </ul>
-
-            <div class="mt-8 px-4">
-                <h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Configuración
-                </h3>
-                <ul class="mt-2 space-y-1">
-                    <li>
-                        <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
-                            <i class="fas fa-user-circle w-5 h-5 mr-3"/>
-                            Mi Perfil
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                            <i class="fas fa-cog w-5 h-5 mr-3"></i>
-                            Ajustes
-                        </NavLink>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-        <!-- User -->
-        <div class="p-4 border-t border-gray-700">
-            <div class="flex items-center">
-                <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
-                <div>
-                    <p class="text-sm font-medium">Miguel Ángel</p>
-                    <p class="text-xs text-gray-400">Barbero</p>
-                </div>
-                <button id="logout-sidebar-button" class="ml-auto text-gray-400 hover:text-white">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </div>
+        <div class="flex-1 px-3 overflow-hidden">
+          <p class="text-sm font-medium tracking-wide text-gray-100 truncate">
+            @(_profileDto?.FullName ?? "Mi Cuenta")
+          </p>
+          <p class="text-xs text-gray-400 font-medium truncate">
+            Barbero
+          </p>
         </div>
-    </aside>
 
-    <!-- Mobile sidebar toggle -->
-    <div class="md:hidden fixed bottom-4 right-4 z-50">
-        <button id="mobile-menu-button" class="bg-primary text-white p-3 rounded-full shadow-lg">
-            <i class="fas fa-bars"></i>
+        <button @onclick="Logout"
+                class="p-2 rounded-full text-gray-400 hover:text-white transition-colors"
+                title="Cerrar sesión">
+          <i class="fas fa-arrow-right-from-bracket"></i>
         </button>
+      </div>
     </div>
+  </aside>
 
-    <!-- Mobile sidebar (hidden by default) -->
-    <div id="mobile-sidebar" class="fixed inset-0 z-40 hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-50" id="mobile-sidebar-backdrop"></div>
-        <div class="absolute inset-y-0 left-0 w-64 bg-surface transform transition-transform duration-300 -translate-x-full" id="mobile-sidebar-content">
-            <!-- Mobile sidebar content (same as desktop) -->
-            <!-- Logo -->
-            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
-                <NavLink href="/" class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    Trimly
-                </NavLink>
-                <button id="close-mobile-menu" class="text-gray-400 hover:text-white">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+  <!-- Loading Indicator -->
+  @if (_isLoading)
+  {
+    <div class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+    </div>
+  }
 
-            <!-- Navigation -->
-            <nav class="flex-1 overflow-y-auto py-4">
-                <ul class="space-y-1 px-2">
-                    <li>
-                        <NavLink href="barber-dashboard" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                            <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
-                            Dashboard
-                        </NavLink>
-                    </li>
+  <!-- Error Message -->
+  @if (!string.IsNullOrEmpty(_errorMessage))
+  {
+    <div class="fixed top-4 right-4 p-4 bg-red-100 text-red-700 rounded-md shadow-lg z-50 max-w-md">
+      @_errorMessage
+    </div>
+  }
 
-                </ul>
-
-                <div class="mt-8 px-4">
-                    <h3 class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Configuración
-                    </h3>
-                    <ul class="mt-2 space-y-1">
-                        <li>
-                            <NavLink href="/barber/profile" class="flex items-center px-4 py-2 text-sm rounded-md bg-primary/10 text-primary">
-                                <i class="fas fa-user-circle w-5 h-5 mr-3"></i>
-                                Mi Perfil
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink href="/barber/settings" class="flex items-center px-4 py-2 text-sm rounded-md hover:bg-gray-700">
-                                <i class="fas fa-cog w-5 h-5 mr-3"></i>
-                                Ajustes
-                            </NavLink>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- User -->
-            <div class="p-4 border-t border-gray-700">
-                <div class="flex items-center">
-                    <img src="https://via.placeholder.com/40" alt="Avatar" class="w-8 h-8 rounded-full mr-3">
-                    <div>
-                        <p class="text-sm font-medium">Miguel Ángel</p>
-                        <p class="text-xs text-gray-400">Barbero</p>
-                    </div>
-                    <button id="logout-mobile-button" class="ml-auto text-gray-400 hover:text-white">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </div>
-            </div>
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Top Header -->
+    <header class="bg-surface/80 backdrop-blur-md border-b border-white/5">
+      <div class="px-6 py-4 flex justify-between items-center">
+        <div>
+          <h1 class="text-xl font-semibold">Mi Perfil</h1>
+          <p class="text-sm text-gray-400">Administra tu información personal</p>
         </div>
-    </div>
+        <NavLink href="/barber/settings" class="inline-flex items-center bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-lg transition-colors">
+          <i class="fas fa-edit mr-2"></i>
+          Editar Perfil
+        </NavLink>
+      </div>
+    </header>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Top Header -->
-        <header class="bg-surface/80 backdrop-blur-md shadow-md z-10">
-            <div class="px-4 py-4 flex justify-between items-center">
-                <div>
-                    <h1 class="text-xl font-semibold">Mi Perfil</h1>
-                    <p class="text-sm text-gray-400">Gestiona tu información personal</p>
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto bg-background p-6">
+      <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Columna izquierda - Perfil -->
+        <div class="lg:col-span-1">
+          <div class="bg-surface border border-white/5 rounded-xl p-6 sticky top-6">
+            <!-- Avatar dinámico -->
+            <div class="flex flex-col items-center">
+              <div class="relative mb-4">
+                <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+                  @if (!string.IsNullOrEmpty(_profileDto?.FirstName) || !string.IsNullOrEmpty(_profileDto?.LastName))
+                  {
+                    <span>@GetInitial(_profileDto?.FirstName)@GetInitial(_profileDto?.LastName)</span>
+                  }
+                  else
+                  {
+                    <i class="fas fa-user"></i>
+                  }
                 </div>
+              </div>
 
-                <div class="flex items-center space-x-4">
-                    
-                </div>
+              <h2 class="text-2xl font-bold text-center">@(_profileDto?.FullName ?? "Cargando...")</h2>
+              <p class="text-primary mb-4">Barbero</p>
             </div>
-        </header>
+          </div>
+        </div>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto bg-background p-4">
-            <div class="max-w-4xl mx-auto">
-                <!-- Perfil Header -->
-                <div class="bg-surface rounded-lg shadow-md overflow-hidden mb-6">
-                    <div class="h-32 bg-gradient-to-r from-primary to-secondary relative">
-                        <button class="absolute bottom-2 right-2 bg-surface/80 p-2 rounded-full text-white hover:bg-surface">
-                            <i class="fas fa-camera"></i>
-                        </button>
-                    </div>
-
-                    <div class="p-6 relative">
-                        <div class="flex flex-col md:flex-row md:items-end">
-
-                            <div class="mt-8 md:ml-32">
-                                <h2 class="text-2xl font-bold">Miguel Ángel</h2>
-                                <p class="text-gray-400">Barbero</p>
-                            </div>
-
-                            <div class="mt-4 md:mt-0 md:ml-auto">
-                                <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-md flex items-center">
-                                    <i class="fas fa-edit mr-2"></i>
-                                    Editar Perfil
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Información Personal -->
-                <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
-                    <h3 class="text-lg font-semibold mb-4 flex items-center">
-                        <i class="fas fa-user text-primary mr-2"></i>
-                        Información Personal
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Nombre completo</h4>
-                            <p>Miguel Ángel Gómez Sánchez</p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Correo electrónico</h4>
-                            <p>miguel.angel@example.com</p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Teléfono</h4>
-                            <p>+34 623 456 789</p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Fecha de nacimiento</h4>
-                            <p>22 de abril de 1990</p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Dirección</h4>
-                            <p>Calle Alcalá 45, 28001 Madrid</p>
-                        </div>
-                    </div>
-                </div>
-                
-
-                <!-- Información de Cuenta -->
-                <div class="bg-surface rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-semibold mb-4 flex items-center">
-                        <i class="fas fa-shield-alt text-primary mr-2"></i>
-                        Información de Cuenta
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Usuario</h4>
-                            <p>miguelangel</p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-sm text-gray-400 mb-1">Contraseña</h4>
-                            <p>••••••••••</p>
-                            <a href="/barbero-ajustes.html" class="text-primary text-sm hover:text-primary/80">Cambiar contraseña</a>
-                        </div>
-                        
-
-                    </div>
-                </div>
+        <!-- Columna derecha - Información -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Información Personal -->
+          <div class="bg-surface border border-white/5 rounded-xl p-6">
+            <div class="flex items-center mb-4">
+              <div class="bg-primary/10 text-primary p-2 rounded-lg mr-3">
+                <i class="fas fa-user"></i>
+              </div>
+              <h3 class="text-lg font-semibold">Información Personal</h3>
             </div>
-        </main>
-    </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-gray-400">Nombre</label>
+                <p class="font-medium">@(_profileDto?.FirstName ?? "Cargando...")</p>
+              </div>
+
+              <div>
+                <label class="text-sm text-gray-400">Apellido</label>
+                <p class="font-medium">@(_profileDto?.LastName ?? "Cargando...")</p>
+              </div>
+
+              <div>
+                <label class="text-sm text-gray-400">Correo electrónico</label>
+                <p class="font-medium">@(_profileDto?.Email ?? "Cargando...")</p>
+              </div>
+
+              <div>
+                <label class="text-sm text-gray-400">Teléfono</label>
+                <p class="font-medium">
+                  @if (!string.IsNullOrEmpty(_profileDto?.PhoneNumber))
+                  {
+                    @_profileDto.PhoneNumber
+                  }
+                  else
+                  {
+                    <span class="text-gray-500">No especificado</span>
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Cuenta -->
+          <div class="bg-surface border border-white/5 rounded-xl p-6">
+            <div class="flex items-center mb-4">
+              <div class="bg-primary/10 text-primary p-2 rounded-lg mr-3">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <h3 class="text-lg font-semibold">Información de Cuenta</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-gray-400">Nombre de usuario</label>
+                <p class="font-medium">@(_profileDto?.UserName ?? "Cargando...")</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 </div>
-
 </body>
 
 @code {
-    
+    private ProfileDTO _profileDto;
+    private bool _isLoading = true;
+    private string _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProfileData();
+    }
+
+    private async Task LoadProfileData()
+    {
+        try
+        {
+            var userId = await LocalStorage.GetItemAsync<string>("userId");
+            var response = await AuthService.GetAccountDetailsAsync(userId);
+
+            if (response.Success)
+            {
+                _profileDto = response.Data;
+            }
+            else
+            {
+                _errorMessage = response.ErrorMessage ?? "Error al cargar el perfil";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetInitial(string name)
+    {
+        return !string.IsNullOrEmpty(name) ? name[0].ToString().ToUpper() : "";
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        NavigationManager.NavigateTo("/login");
+    }
 }

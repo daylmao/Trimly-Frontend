@@ -1,9 +1,10 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Blazored.LocalStorage;
-
+using Trimly.Core.Application;
 using Trimly.Core.Application.DTOs;
 using Trimly.Core.Application.DTOs.Companies;
+using Trimly.Core.Application.DTOs.Schedules;
 
 namespace Trimly.Infrastructure.Api.Services;
 
@@ -55,11 +56,13 @@ public class RegisteredCompanyHttpService : IRegisteredCompanyService
             };
         }
 
-        var errorContent = await response.Content.ReadAsStringAsync();
+        var validationMessages = await response.Content.ReadFromJsonAsync<List<ValidationMessage>>();
         return new ApiResponse<CreateRegisteredCompaniesDTO>
         {
             Success = false,
-            ErrorMessage = $"Error: {response.StatusCode} - {errorContent}",
+            ValidationMessages = validationMessages,
+            Error = "Validation failed"
+
         };
     }
     catch (Exception ex)
@@ -93,5 +96,25 @@ public class RegisteredCompanyHttpService : IRegisteredCompanyService
         }
     
         return companies;
+    }
+
+    public async Task<ApiResponse<RegisteredCompaniesDTO>> GetRegisteredCompanyById(Guid companyIds)
+    {
+        var response = await _httpClient.GetAsync($"api/v1/registeredCompanies/{companyIds}");
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<RegisteredCompaniesDTO>();
+            return new ApiResponse<RegisteredCompaniesDTO>()
+            {
+                Success = true,
+                Data = result
+            };
+        }
+        var errorContent = await response.Content.ReadFromJsonAsync<List<ValidationMessage>>();
+        return new ApiResponse<RegisteredCompaniesDTO>()
+        {
+            Success = false,
+            ValidationMessages = errorContent
+        };
     }
 }

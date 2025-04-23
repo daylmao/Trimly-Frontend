@@ -1,6 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Blazored.LocalStorage;
+using Blazorise;
+using Blazorise.FluentUI2;
+using Blazorise.Icons.FluentUI;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -37,6 +40,12 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRegisteredCompanyService, RegisteredCompanyHttpService>();
 builder.Services.AddScoped<IScheduleService, ScheduleHttpService>();
 builder.Services.AddScoped<IServices, ServicesHttp>();
+builder.Services.AddScoped<IAppointmentHttpService, AppointmentHttpService>();
+builder.Services.AddScoped<IReviewsService, ReviewsService>();
+builder.Services
+    .AddBlazorise()
+    .AddFluentUI2Providers()
+    .AddFluentUIIcons();
 builder.Services.Configure<JsonSerializerOptions>(options =>
 {
     options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

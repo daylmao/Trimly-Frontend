@@ -1,0 +1,107 @@
+@inherits InputBase<DateTime>
+
+<div class="flex flex-col">
+    <label class="text-sm font-medium mb-1">Día *</label>
+    <div class="flex gap-2">
+        <!-- Selector de Día -->
+        <div class="relative flex-1">
+            <select @bind="SelectedDay" 
+                   @oninput="HandleDayChange"
+                   class="appearance-none w-full text-sm px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 shadow-inner backdrop-blur-sm pr-8"
+                   aria-label="Seleccionar día">
+                @foreach (var day in DaysInMonth)
+                {
+                    <option value="@day" class="bg-surface text-white">@day</option>
+                }
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none" aria-hidden="true">
+                <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+            </div>
+        </div>
+        
+        <!-- Selector de Hora -->
+        <input type="time"
+               value="@CurrentTime"
+               @oninput="HandleTimeChange"
+               class="flex-1 text-sm px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 shadow-inner backdrop-blur-sm"
+               aria-label="Seleccionar hora" />
+    </div>
+</div>
+
+@code {
+    private int SelectedDay { get; set; } = DateTime.Today.Day;
+    private string CurrentTime { get; set; } = DateTime.Now.ToString("HH:mm");
+    private List<int> DaysInMonth { get; set; } = new();
+
+    [Parameter] public EventCallback<DateTime> OnDateTimeChanged { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        UpdateDaysList();
+        if (CurrentValue != default)
+        {
+            SelectedDay = CurrentValue.Day;
+            CurrentTime = CurrentValue.ToString("HH:mm");
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (CurrentValue != default && CurrentValue != CombineDateTimeParts())
+        {
+            UpdateDaysList();
+            SelectedDay = CurrentValue.Day;
+            CurrentTime = CurrentValue.ToString("HH:mm");
+        }
+    }
+
+    private void UpdateDaysList()
+    {
+        var baseDate = CurrentValue == default ? DateTime.Today : CurrentValue;
+        var daysInMonth = DateTime.DaysInMonth(baseDate.Year, baseDate.Month);
+        DaysInMonth = Enumerable.Range(1, daysInMonth).ToList();
+
+        if (SelectedDay > daysInMonth)
+        {
+            SelectedDay = daysInMonth;
+            CurrentValue = CombineDateTimeParts();
+        }
+    }
+
+    protected override bool TryParseValueFromString(string value, out DateTime result, out string validationErrorMessage)
+    {
+        result = CombineDateTimeParts();
+        validationErrorMessage = null;
+        return true;
+    }
+
+    private DateTime CombineDateTimeParts()
+    {
+        var baseDate = CurrentValue == default ? DateTime.Today : CurrentValue;
+        var timeParts = CurrentTime.Split(':');
+        var hours = int.Parse(timeParts[0]);
+        var minutes = int.Parse(timeParts[1]);
+
+        return new DateTime(baseDate.Year, baseDate.Month, SelectedDay, hours, minutes, 0);
+    }
+
+    private async Task HandleTimeChange(ChangeEventArgs e)
+    {
+        CurrentTime = e.Value?.ToString();
+        CurrentValue = CombineDateTimeParts();
+        await OnDateTimeChanged.InvokeAsync(CurrentValue);
+    }
+
+    private async Task HandleDayChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var day))
+        {
+            SelectedDay = day;
+            CurrentValue = CombineDateTimeParts();
+            await OnDateTimeChanged.InvokeAsync(CurrentValue);
+        }
+    }
+
+}

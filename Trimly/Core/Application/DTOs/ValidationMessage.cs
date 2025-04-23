@@ -4,4 +4,5 @@ public class ValidationMessage
 {
     public string? propertyName { get; set; }
     public string? errorMessage { get; set; }
+    
 }
