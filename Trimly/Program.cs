@@ -41,7 +41,6 @@ builder.Services.AddScoped<IRegisteredCompanyService, RegisteredCompanyHttpServi
 builder.Services.AddScoped<IScheduleService, ScheduleHttpService>();
 builder.Services.AddScoped<IServices, ServicesHttp>();
 builder.Services.AddScoped<IAppointmentHttpService, AppointmentHttpService>();
-builder.Services.AddScoped<IReviewsService, ReviewsService>();
 builder.Services
     .AddBlazorise()
     .AddFluentUI2Providers()
