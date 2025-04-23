@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -20,6 +21,84 @@ public class AppointmentHttpService : IAppointmentHttpService
         _httpClient = httpClient;
     }
 
+    public async Task<ApiResponse<RescheduleAppointmentDTos>> RescheduleAppointmentAsync(Guid appointmentId, RescheduleAppointmentDTos request)
+    {
+        try
+        {
+            if (appointmentId == Guid.Empty)
+            {
+                return new ApiResponse<RescheduleAppointmentDTos>
+                {
+                    Success = false,
+                    ErrorMessage = "Invalid appointment ID",
+                };
+            }
+
+            if (request?.NewStartDateTime == null || request.NewEndDateTime == null)
+            {
+                return new ApiResponse<RescheduleAppointmentDTos>
+                {
+                    Success = false,
+                    ErrorMessage = "Start and end datetime are required",
+                };
+            }
+
+            if (request.NewStartDateTime >= request.NewEndDateTime)
+            {
+                return new ApiResponse<RescheduleAppointmentDTos>
+                {
+                    Success = false,
+                    ErrorMessage = "End datetime must be after start datetime",
+                };
+            }
+
+            var response = await _httpClient.PutAsJsonAsync(
+                $"api/v1/appointments/reschedule/{appointmentId}", 
+                request);
+
+            var content = await response.Content.ReadFromJsonAsync<RescheduleAppointmentDTos>();
+            if (response.IsSuccessStatusCode)
+            {
+                return new ApiResponse<RescheduleAppointmentDTos>
+                {
+                    Success = true,
+                    Data = content
+                };
+            }
+
+            // Errors
+            return new ApiResponse<RescheduleAppointmentDTos>
+            {
+                Success = false,
+                ErrorMessage =  "Failed to reschedule appointment",
+            };
+        }
+        catch (HttpRequestException ex)
+        {
+            return new ApiResponse<RescheduleAppointmentDTos>
+            {
+                Success = false,
+                ErrorMessage = $"Network error: {ex.Message}"
+            };
+        }
+        catch (JsonException ex)
+        {
+            return new ApiResponse<RescheduleAppointmentDTos>
+            {
+                Success = false,
+                ErrorMessage = $"Error processing the response: {ex.Message}"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<RescheduleAppointmentDTos>
+            {
+                Success = false,
+                ErrorMessage = $"Unexpected error: {ex.Message}",
+            };
+        }
+    }
+    
     public async Task<ApiResponse<IEnumerable<AppointmentDTos>>> GetAppointmentsByStatusAsync(AppointmentStatus status)
     {
         var response = await _httpClient.GetAsync($"api/v1/appointments/search/status/{status}");
@@ -166,65 +245,65 @@ public class AppointmentHttpService : IAppointmentHttpService
         }
     }
     
-  public async Task<ApiResponse<PagedResponse<AppointmentDTos>>> PaginationAppointmentsAsync(
-    int pageNumber, 
-    int pageSize)
-{
-    try
+    public async Task<ApiResponse<PagedResponse<AppointmentDTos>>> PaginationAppointmentsAsync(
+        int pageNumber, 
+        int pageSize)
     {
-        if (pageNumber < 1) pageNumber = 1;
-        if (pageSize < 1 || pageSize > 100) pageSize = 10;
-
-        var requestUri = $"api/v1/appointments/pagination?pageNumber={pageNumber}&pageSize={pageSize}";
-
-        using var response = await _httpClient.GetAsync(requestUri);
-
-        if (response.IsSuccessStatusCode)
+        try
         {
-            var pagedData = await response.Content.ReadFromJsonAsync<PagedResponse<AppointmentDTos>>();
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1 || pageSize > 100) pageSize = 10;
+
+            var requestUri = $"api/v1/appointments/pagination?pageNumber={pageNumber}&pageSize={pageSize}";
+
+            using var response = await _httpClient.GetAsync(requestUri);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var pagedData = await response.Content.ReadFromJsonAsync<PagedResponse<AppointmentDTos>>();
             
+                return new ApiResponse<PagedResponse<AppointmentDTos>>
+                {
+                    Success = true,
+                    Data = pagedData ?? new PagedResponse<AppointmentDTos>()
+                };
+            }
+
+            return await HandleErrorResponse<PagedResponse<AppointmentDTos>>(response);
+        }
+        catch (Exception ex)
+        {
             return new ApiResponse<PagedResponse<AppointmentDTos>>
             {
-                Success = true,
-                Data = pagedData ?? new PagedResponse<AppointmentDTos>()
+                Success = false,
+                Error = $"Error inesperado: {ex.Message}"
             };
         }
+    }
 
-        return await HandleErrorResponse<PagedResponse<AppointmentDTos>>(response);
-    }
-    catch (Exception ex)
+    private async Task<ApiResponse<T>> HandleErrorResponse<T>(HttpResponseMessage response)
     {
-        return new ApiResponse<PagedResponse<AppointmentDTos>>
-        {
-            Success = false,
-            Error = $"Error inesperado: {ex.Message}"
-        };
-    }
-}
+        var errorContent = await response.Content.ReadAsStringAsync();
 
-private async Task<ApiResponse<T>> HandleErrorResponse<T>(HttpResponseMessage response)
-{
-    var errorContent = await response.Content.ReadAsStringAsync();
-
-    try
-    {
-        var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(errorContent);
-        return new ApiResponse<T>
+        try
         {
-            Success = false,
-            Error = errorResponse?.Message ?? $"Error del servidor ({(int)response.StatusCode})"
-        };
-    }
-    catch
-    {
-        return new ApiResponse<T>
+            var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(errorContent);
+            return new ApiResponse<T>
+            {
+                Success = false,
+                Error = errorResponse?.Message ?? $"Error del servidor ({(int)response.StatusCode})"
+            };
+        }
+        catch
         {
-            Success = false,
-            Error = !string.IsNullOrEmpty(errorContent) 
-                ? errorContent 
-                : $"Error del servidor ({(int)response.StatusCode})"
-        };
+            return new ApiResponse<T>
+            {
+                Success = false,
+                Error = !string.IsNullOrEmpty(errorContent) 
+                    ? errorContent 
+                    : $"Error del servidor ({(int)response.StatusCode})"
+            };
+        }
     }
-}
 
 }

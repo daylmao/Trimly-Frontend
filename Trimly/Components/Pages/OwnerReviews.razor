@@ -1,4 +1,9 @@
 @page "/owner/reviews"
+@using System.Text.Json
+@using Trimly.Core.Application.DTOs.Reviews
+@using Trimly.Core.Application.Pagination
+@using Trimly.Infrastructure.Api
+@inject IReviewsService ReviewsService
 
 <body class="min-h-screen bg-background text-text">
 <div class="flex h-screen overflow-hidden">
@@ -229,10 +234,6 @@
                     <h1 class="text-xl font-semibold">Gestión de Reseñas</h1>
                     <p class="text-sm text-gray-400">Administra las reseñas de tus barberías</p>
                 </div>
-
-                <div class="flex items-center space-x-4">
-
-                </div>
             </div>
         </header>
 
@@ -240,406 +241,158 @@
         <main class="flex-1 overflow-y-auto bg-background p-4">
             <!-- Filtros y Acciones -->
             <div class="bg-surface rounded-lg shadow-md p-4 mb-6">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div class="flex flex-col md:flex-row gap-4 md:items-center">
-                        <!-- Búsqueda -->
-                        <div class="w-full md:w-64">
-                            <div class="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Buscar reseñas..."
-                                    class="w-full bg-gray-700 border border-gray-600 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                                />
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <i class="fas fa-search text-gray-400"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Filtro por Barbería -->
-                        <div class="w-full md:w-48">
-                            <select class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="all">Todas las barberías</option>
-                                <option value="1">Barbería Moderna</option>
-                                <option value="2">Barber Shop Elite</option>
-                                <option value="3">Classic Cuts</option>
-                            </select>
-                        </div>
-
-                        <!-- Filtro por Valoración -->
-                        <div class="w-full md:w-48">
-                            <select class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="all">Todas las valoraciones</option>
-                                <option value="5">5 estrellas</option>
-                                <option value="4">4 estrellas</option>
-                                <option value="3">3 estrellas</option>
-                                <option value="2">2 estrellas</option>
-                                <option value="1">1 estrella</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Filtro por Fecha -->
-                    <div class="w-full md:w-auto">
-                        <select class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                            <option value="all">Todas las fechas</option>
-                            <option value="today">Hoy</option>
-                            <option value="week">Esta semana</option>
-                            <option value="month">Este mes</option>
-                            <option value="year">Este año</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Resumen de Valoraciones -->
-            <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-lg font-semibold mb-4">Resumen de Valoraciones</h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Valoración Media -->
-                    <div class="bg-gray-700/50 rounded-lg p-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-sm font-medium text-gray-400">Valoración Media</h3>
-                            <span class="text-xs text-gray-400">Todas las barberías</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="text-3xl font-bold mr-2">4.7</span>
-                            <div class="flex text-yellow-500">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                        </div>
-                        <p class="text-xs text-gray-400 mt-2">Basado en 245 reseñas</p>
-                    </div>
-
-                    <!-- Distribución de Estrellas -->
-                    <div class="bg-gray-700/50 rounded-lg p-4 col-span-1 md:col-span-2">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-sm font-medium text-gray-400">Distribución de Valoraciones</h3>
-                        </div>
-
-                        <div class="space-y-2">
-                            <!-- 5 estrellas -->
-                            <div class="flex items-center">
-                                <div class="flex text-yellow-500 w-24">
-                                    <span class="text-xs mr-1">5</span>
-                                    <i class="fas fa-star text-xs"></i>
-                                </div>
-                                <div class="flex-1 h-2 bg-gray-600 rounded-full overflow-hidden">
-                                    <div class="bg-green-500 h-full rounded-full" style="width: 70%"></div>
-                                </div>
-                                <span class="text-xs ml-2 w-10 text-right">70%</span>
-                            </div>
-
-                            <!-- 4 estrellas -->
-                            <div class="flex items-center">
-                                <div class="flex text-yellow-500 w-24">
-                                    <span class="text-xs mr-1">4</span>
-                                    <i class="fas fa-star text-xs"></i>
-                                </div>
-                                <div class="flex-1 h-2 bg-gray-600 rounded-full overflow-hidden">
-                                    <div class="bg-green-400 h-full rounded-full" style="width: 20%"></div>
-                                </div>
-                                <span class="text-xs ml-2 w-10 text-right">20%</span>
-                            </div>
-
-                            <!-- 3 estrellas -->
-                            <div class="flex items-center">
-                                <div class="flex text-yellow-500 w-24">
-                                    <span class="text-xs mr-1">3</span>
-                                    <i class="fas fa-star text-xs"></i>
-                                </div>
-                                <div class="flex-1 h-2 bg-gray-600 rounded-full overflow-hidden">
-                                    <div class="bg-yellow-500 h-full rounded-full" style="width: 5%"></div>
-                                </div>
-                                <span class="text-xs ml-2 w-10 text-right">5%</span>
-                            </div>
-
-                            <!-- 2 estrellas -->
-                            <div class="flex items-center">
-                                <div class="flex text-yellow-500 w-24">
-                                    <span class="text-xs mr-1">2</span>
-                                    <i class="fas fa-star text-xs"></i>
-                                </div>
-                                <div class="flex-1 h-2 bg-gray-600 rounded-full overflow-hidden">
-                                    <div class="bg-orange-500 h-full rounded-full" style="width: 3%"></div>
-                                </div>
-                                <span class="text-xs ml-2 w-10 text-right">3%</span>
-                            </div>
-
-                            <!-- 1 estrella -->
-                            <div class="flex items-center">
-                                <div class="flex text-yellow-500 w-24">
-                                    <span class="text-xs mr-1">1</span>
-                                    <i class="fas fa-star text-xs"></i>
-                                </div>
-                                <div class="flex-1 h-2 bg-gray-600 rounded-full overflow-hidden">
-                                    <div class="bg-red-500 h-full rounded-full" style="width: 2%"></div>
-                                </div>
-                                <span class="text-xs ml-2 w-10 text-right">2%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Reseñas Recientes -->
-                    <div class="bg-gray-700/50 rounded-lg p-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-sm font-medium text-gray-400">Reseñas Recientes</h3>
-                        </div>
-                        <div class="flex flex-col">
-                            <div class="text-3xl font-bold">32</div>
-                            <div class="flex items-center text-xs text-green-500 mt-1">
-                                <i class="fas fa-arrow-up mr-1"></i>
-                                <span>12% más que el mes pasado</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-gray-400 mt-2">Últimos 30 días</p>
-                    </div>
-                </div>
+                <!-- Puedes agregar filtros aquí si los necesitas -->
             </div>
 
             <!-- Lista de Reseñas -->
             <div class="bg-surface rounded-lg shadow-md p-6">
-                <h2 class="text-lg font-semibold mb-4">Reseñas Recientes</h2>
-
-                <div class="space-y-6">
-                    <!-- Reseña 1 -->
-                    <div class="bg-gray-700/50 rounded-lg p-4">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-start">
-                                <img src="https://via.placeholder.com/40" alt="Cliente" class="w-10 h-10 rounded-full mr-3">
-                                <div>
-                                    <h3 class="font-medium">Carlos Rodríguez</h3>
-                                    <div class="flex items-center mt-1">
-                                        <div class="flex text-yellow-500 mr-2">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                        </div>
-                                        <span class="text-xs text-gray-400">Hace 2 días</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full mr-2">Barbería Moderna</span>
-                                <div class="dropdown relative">
-                                    <button class="p-1 hover:bg-gray-600 rounded-full">
-                                        <i class="fas fa-ellipsis-v text-gray-400"></i>
-                                    </button>
-                                    <div class="dropdown-menu absolute right-0 mt-1 w-40 bg-gray-800 rounded-md shadow-lg py-1 hidden">
-                                        <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700">Responder</button>
-                                        <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700">Marcar como destacada</button>
-                                        <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-red-400">Reportar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="text-sm mb-3">
-                            Excelente servicio, Miguel Ángel es un profesional increíble. El corte quedó perfecto y el ambiente de la barbería es muy agradable. Definitivamente volveré.
-                        </p>
-
-                        <div class="flex items-center text-xs text-gray-400">
-                            <span class="mr-3">Servicio: Corte de cabello</span>
-                            <span>Barbero: Miguel Ángel</span>
-                        </div>
-
-                        <!-- Respuesta (si existe) -->
-                        <div class="mt-3 pl-4 border-l-2 border-gray-600">
-                            <div class="flex items-start">
-                                <img src="https://via.placeholder.com/40" alt="Barbería" class="w-8 h-8 rounded-full mr-2">
-                                <div>
-                                    <h4 class="text-sm font-medium">Barbería Moderna <span class="text-xs text-gray-400">- Hace 1 día</span></h4>
-                                    <p class="text-xs mt-1">
-                                        ¡Gracias por tu reseña, Carlos! Nos alegra que hayas disfrutado de tu experiencia con nosotros. Esperamos verte pronto nuevamente.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Reseña 2 -->
-                    <div class="bg-gray-700/50 rounded-lg p-4">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-start">
-                                <img src="https://via.placeholder.com/40" alt="Cliente" class="w-10 h-10 rounded-full mr-3">
-                                <div>
-                                    <h3 class="font-medium">Ana Martínez</h3>
-                                    <div class="flex items-center mt-1">
-                                        <div class="flex text-yellow-500 mr-2">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="far fa-star"></i>
-                                        </div>
-                                        <span class="text-xs text-gray-400">Hace 3 días</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full mr-2">Barber Shop Elite</span>
-                                <div class="dropdown relative">
-                                    <button class="p-1 hover:bg-gray-600 rounded-full">
-                                        <i class="fas fa-ellipsis-v text-gray-400"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="text-sm mb-3">
-                            Muy buen servicio en general. Carlos es muy profesional y el resultado fue muy bueno. El único detalle es que tuve que esperar un poco más de lo previsto, pero valió la pena.
-                        </p>
-
-                        <div class="flex items-center text-xs text-gray-400">
-                            <span class="mr-3">Servicio: Corte y peinado</span>
-                            <span>Barbero: Carlos Martínez</span>
-                        </div>
-
-                        <!-- Sin respuesta -->
-                        <div class="mt-3 flex items-center">
-                            <button class="text-xs text-primary hover:text-primary/80">
-                                <i class="fas fa-reply mr-1"></i>
-                                Responder
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Reseña 3 -->
-                    <div class="bg-gray-700/50 rounded-lg p-4">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-start">
-                                <img src="https://via.placeholder.com/40" alt="Cliente" class="w-10 h-10 rounded-full mr-3">
-                                <div>
-                                    <h3 class="font-medium">Pedro Sánchez</h3>
-                                    <div class="flex items-center mt-1">
-                                        <div class="flex text-yellow-500 mr-2">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="far fa-star"></i>
-                                            <i class="far fa-star"></i>
-                                        </div>
-                                        <span class="text-xs text-gray-400">Hace 1 semana</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full mr-2">Classic Cuts</span>
-                                <div class="dropdown relative">
-                                    <button class="p-1 hover:bg-gray-600 rounded-full">
-                                        <i class="fas fa-ellipsis-v text-gray-400"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="text-sm mb-3">
-                            El servicio fue regular. El corte no quedó exactamente como lo pedí y el local estaba un poco desordenado. Espero que mejoren estos aspectos para la próxima visita.
-                        </p>
-
-                        <div class="flex items-center text-xs text-gray-400">
-                            <span class="mr-3">Servicio: Corte de cabello</span>
-                            <span>Barbero: Roberto Sánchez</span>
-                        </div>
-
-                        <!-- Respuesta (si existe) -->
-                        <div class="mt-3 pl-4 border-l-2 border-gray-600">
-                            <div class="flex items-start">
-                                <img src="https://via.placeholder.com/40" alt="Barbería" class="w-8 h-8 rounded-full mr-2">
-                                <div>
-                                    <h4 class="text-sm font-medium">Classic Cuts <span class="text-xs text-gray-400">- Hace 6 días</span></h4>
-                                    <p class="text-xs mt-1">
-                                        Lamentamos que tu experiencia no haya sido la mejor. Nos gustaría que nos des otra oportunidad, hemos tomado nota de tus comentarios para mejorar nuestro servicio. ¡Gracias por tu feedback!
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Reseña 4 -->
-                    <div class="bg-gray-700/50 rounded-lg p-4">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-start">
-                                <img src="https://via.placeholder.com/40" alt="Cliente" class="w-10 h-10 rounded-full mr-3">
-                                <div>
-                                    <h3 class="font-medium">Laura García</h3>
-                                    <div class="flex items-center mt-1">
-                                        <div class="flex text-yellow-500 mr-2">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star-half-alt"></i>
-                                        </div>
-                                        <span class="text-xs text-gray-400">Hace 1 semana</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full mr-2">Barbería Moderna</span>
-                                <div class="dropdown relative">
-                                    <button class="p-1 hover:bg-gray-600 rounded-full">
-                                        <i class="fas fa-ellipsis-v text-gray-400"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="text-sm mb-3">
-                            Javier hizo un trabajo increíble con mi corte. Además, el ambiente de la barbería es muy acogedor y el servicio al cliente es excelente. Recomiendo totalmente este lugar.
-                        </p>
-
-                        <div class="flex items-center text-xs text-gray-400">
-                            <span class="mr-3">Servicio: Corte y afeitado</span>
-                            <span>Barbero: Javier López</span>
-                        </div>
-
-                        <!-- Sin respuesta -->
-                        <div class="mt-3 flex items-center">
-                            <button class="text-xs text-primary hover:text-primary/80">
-                                <i class="fas fa-reply mr-1"></i>
-                                Responder
-                            </button>
-                        </div>
-                    </div>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Reseñas Recientes</h2>
+                    @if(reviewsResponse.Items.Any())
+                    {
+                    <span class="text-sm text-gray-400">
+                            Mostrando @((reviewsResponse.PageNumber - 1) * reviewsResponse.PageSize + 1)-@Math.Min(reviewsResponse.PageNumber * reviewsResponse.PageSize, reviewsResponse.TotalCount) de @reviewsResponse.TotalCount
+                        </span>
+                    }
                 </div>
 
-                <!-- Paginación -->
-                <div class="mt-6 flex justify-center">
-                    <nav class="flex items-center space-x-1">
-                        <button class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-sm">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="px-3 py-1 rounded-md bg-primary text-white text-sm">1</button>
-                        <button class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-sm">2</button>
-                        <button class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-sm">3</button>
-                        <span class="px-2 text-gray-400">...</span>
-                        <button class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-sm">8</button>
-                        <button class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-sm">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </nav>
+                
+                @if (reviewsResponse.Items.Any())
+                {
+                <div class="space-y-4">
+                    @foreach (var review in reviewsResponse.Items)
+                    {
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <!-- Contenido de cada reseña -->
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-start">
+                                <img src="https://via.placeholder.com/40" alt="Cliente" class="w-10 h-10 rounded-full mr-3">
+                                <div>
+                                    <h3 class="font-medium">@(review.Title ?? "Reseña sin título")</h3>
+                                    <div class="flex items-center mt-1">
+                                        <div class="flex text-yellow-500 mr-2">
+                                            @for (int i = 0; i < 5; i++)
+                                            {
+                                            if (i < review.Rating)
+                                            {
+                                            <i class="fas fa-star"></i>
+                                            }
+                                            else
+                                            {
+                                            <i class="far fa-star"></i>
+                                            }
+                                            }
+                                        </div>
+                                        <span class="text-xs text-gray-400">@review.CreatedAt?.ToString("dd MMM yyyy")</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full mr-2">Barbería</span>
+                            </div>
+                        </div>
+
+                        <p class="text-sm mb-3">
+                            @review.Comment
+                        </p>
+
+                        <div class="flex items-center text-xs text-gray-400">
+                            <span class="mr-3">ID: @review.ReviewId</span>
+                        </div>
+                    </div>
+                    }
                 </div>
+                }
+                else
+                {
+                <div class="text-center py-8">
+                    <i class="fas fa-comment-slash text-4xl text-gray-500 mb-2"></i>
+                    <p class="text-gray-400">No hay reseñas disponibles</p>
+                </div>
+                }
             </div>
         </main>
     </div>
 </div>
+    </body>
 
-</body>
-
-@code
-{
-
-
+  @code {
+    private PagedResponse<ReviewsDTos> reviewsResponse = new(); // Inicializar como null
+    private int currentPage = 2;
+    private int pageSize = 2;
+    private int totalPages = 1;
+    private System.Threading.Timer refreshTimer;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadReviews();
+        refreshTimer = new System.Threading.Timer(async _ => 
+        {
+            await InvokeAsync(async () =>
+            {
+                await LoadReviews();
+                StateHasChanged();
+            });
+        }, null, 60000, 60000);
+    }
+    
+    private async Task LoadReviews()
+    {
+        try
+        {
+            var response = await ReviewsService.PaginationReviews(pageNumber: currentPage,
+                pageSize: pageSize);
+        
+            if (response.Success)
+            {
+                reviewsResponse = new PagedResponse<ReviewsDTos>
+                {
+                    Items = new List<ReviewsDTos>(response.Data.Items),
+                    TotalCount = response.Data.TotalCount, // Cambiar de TotalCount a TotalItems
+                    PageNumber = response.Data.PageNumber, // Cambiar de PageNumber a CurrentPage
+                    PageSize = response.Data.PageSize
+                };
+                
+                totalPages = (int)Math.Ceiling((double)reviewsResponse.TotalCount / pageSize);
+            }
+            else
+            {
+                reviewsResponse = new PagedResponse<ReviewsDTos>
+                {
+                    Items = new List<ReviewsDTos>(),
+                    TotalCount = 0,
+                    PageNumber = currentPage,
+                    PageSize = pageSize
+                };
+                
+                totalPages = 1;
+                
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading reviews: {ex.Message}");
+            reviewsResponse = new PagedResponse<ReviewsDTos>
+            {
+                Items = new List<ReviewsDTos>(),
+                TotalCount = 0,
+                PageNumber = currentPage,
+                PageSize = pageSize
+            };
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+    
+    public void Dispose()
+    {
+        refreshTimer?.Dispose();
+    }
+    
     private async Task Logout()
     {
-        
+        // Implementación de logout
     }
 }
