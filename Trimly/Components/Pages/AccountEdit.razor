@@ -3,6 +3,7 @@
 @inject IAuthService AuthService
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = nameof(Roles.Client))]
 
 <body class="min-h-screen bg-background text-text flex flex-col">
 <!-- Header -->

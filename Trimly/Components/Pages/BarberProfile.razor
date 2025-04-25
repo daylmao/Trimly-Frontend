@@ -4,6 +4,8 @@
 @inject CustomAuthStateProvider CustomAuthStateProvider
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = ("Barber"))]
+
 
 <body class="min-h-screen bg-background text-text">
 <div class="flex h-screen overflow-hidden">
