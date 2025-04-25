@@ -4,6 +4,8 @@
 @inject ILocalStorageService LocalStorage
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = nameof(Roles.Client))]
+
 
 @{
   var culture = new CultureInfo("es-DO");

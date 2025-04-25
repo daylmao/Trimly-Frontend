@@ -8,6 +8,7 @@
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
 @inject IReviewsService ReviewsService
+@attribute [Authorize(Roles = nameof(Roles.Client))]
 
 <div class="bg-background text-text min-h-screen flex flex-col">
   <!-- Header -->

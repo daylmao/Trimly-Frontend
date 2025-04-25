@@ -6,6 +6,7 @@
 @inject IAuthService AuthService
 @inject IAppointmentHttpService _appointmentService
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = nameof(Roles.Client))]
 
 <body class="bg-background text-text min-h-screen">
 <!-- Encabezado con efecto de vidrio esmerilado mejorado -->
@@ -293,7 +294,7 @@
 @code {
   
   private PagedResponse<AppointmentDTos> pagedAppointments = new();
-  private int currentPage = 2;
+  private int currentPage = 1;
   private int pageSize = 15;
   private bool isProcessing = false;
   private Guid? currentProcessingId = null;
